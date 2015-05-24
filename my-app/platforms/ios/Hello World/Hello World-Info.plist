@@ -8,6 +8,12 @@
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
+	<key>ExternalHosts</key>
+	<array>
+		<string>*.google.com</string>
+		<string>*.googleapis.com</string>
+		<string>*.gstatic.com</string>
+	</array>
 	<key>CFBundleIconFile</key>
 	<string>icon.png</string>
 	<key>CFBundleIcons</key>

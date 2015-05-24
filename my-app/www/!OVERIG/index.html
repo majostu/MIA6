@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html ng-app="handyfriendly">
+<head>
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+<!--<link rel="stylesheet" type="text/css" href="components/onsen/css/onsenui.css"/>
+<link rel="stylesheet" type="text/css" href="components/onsen/css/onsen-css-components.css"/>-->
+<link rel="stylesheet" href="components/loader.css">
+<link rel="stylesheet" type="text/css" href="css/index.css" />
+<!--<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="components/onsen/js/angular/angular.js"></script>
+<script type="text/javascript" src="components/onsen/js/onsenui.js"></script>-->
+<script type="text/javascript" src="components/loader.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript" src="js/controller.js"></script>
+<!--<script type="text/javascript" src="js/index.js"></script>-->
+<script type="text/javascript">
+	//app.initialize();
+	
+	angular.module('handyfriendly', ['onsen']);
+	angular.module('handyfriendly').controller('AppController', function($scope) {
+      $scope.doSomething = function() {
+        ons.notification.alert({message: 'Hello, World!'});
+      };
+    });	
+</script>
+<title>Handy Friendly</title>
+</head>
+<body ng-controller="AppController">
+
+<!--==============================================================
+FOOTER TOOLBAR
+===============================================================-->
+    <ons-tabbar>
+        <ons-tab page="map.html" active="true">
+        	<ons-icon icon="ion-map" class="tab-icon"></ons-icon>
+		</ons-tab>
+		<ons-tab page="favorites.html">
+        	<ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+		</ons-tab>
+		<ons-tab page="settings.html">
+        	<ons-icon icon="ion-settings" class="tab-icon"></ons-icon>
+		</ons-tab>
+    </ons-tabbar>
+<!--==============================================================
+MAP
+===============================================================-->
+    <ons-template id="map.html" ng-controller="MapController">
+        <ons-page>
+        	<!--=======================
+	        HEADER TOOLBAR
+        	========================-->
+            <ons-toolbar>
+  			    <div class="center">HandyFriendly</div>                  
+  		    </ons-toolbar>
+            <!--=======================
+	        PAGE CONTENT
+        	========================--> 
+			<div id="map_canvas"></div>
+
+	        <p class="par-search">
+	            <input type="search" class="search-input search-input-map">
+	        </p>
+	
+	        <p class="par-buttons">
+	            <ons-button  class="btn-delete" ng-click="deleteAllMarkers()">
+	                Delete all markers        
+	            </ons-button>
+	            <ons-button class="btn-distance" ng-click="calculateDistance()">
+	                Distance      
+	            </ons-button>
+	        </p>
+        </ons-page>
+    </ons-template>
+<!--==============================================================
+FAVORITES
+===============================================================-->
+    <ons-template id="favorites.html">
+        <ons-page>
+            <!--=======================
+            HEADER TOOLBAR
+            ========================-->
+    	    <ons-toolbar>
+  			    <div class="center">HandyFriendly</div>                  
+  		    </ons-toolbar>
+  		    <!--=======================
+            PAGE CONTENT
+            ========================-->
+  		    <ons-list>
+  			    <ons-list-item modifier="chevron" class="list-item-container">
+  				    <ons-row>
+  					    <ons-col width="25%">
+  						    <img src="img/icon.png" class="thumbnail">
+  					    </ons-col>
+  					    <ons-col width="50%">
+  						    <div class="name">
+  						    De Bijenkorf
+          				    </div>
+		  				    <div class="location">
+		  					    <i class="fa fa-map-marker"></i> Eindhoven, Nederland
+          				    </div>
+		  				    <div class="desc">
+    		  				    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+                                <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+                                <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+                                <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+                                <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+          				    </div>
+		  			    </ons-col>
+		  			    <ons-col width="25%"></ons-col>
+		  		    </ons-row>
+		  	    </ons-list-item>  
+		    </ons-list>
+        </ons-page>
+    </ons-template>
+          
+</body>
+</html>
