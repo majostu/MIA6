@@ -32,57 +32,40 @@ var app = {
 
 app.initialize();
 
-angular.module('handyfriendly', ['onsen'])
+var module = ons.bootstrap('handyfriendly', ['onsen']);
+module.controller('AppController', function($scope) { 
+	ons.ready(function() {
+	// Init code here
+	});
+});
 
-    .controller('AppController', function($scope, $compile) {
-      function initialize() {
-        var myLatlng = new google.maps.LatLng(43.07493,-89.381388);
-        
-        var mapOptions = {
-          center: myLatlng,
-          zoom: 16,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var map = new google.maps.Map(document.getElementById("map_canvas"),
-            mapOptions);
-        
-        //Marker + infowindow + angularjs compiled ng-click
-        var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
-        var compiled = $compile(contentString)($scope);
+module.controller('MapController', function($scope) {
+	ons.ready(function() {
+	// Init code here
+	});
+});
 
-        var infowindow = new google.maps.InfoWindow({
-          content: compiled[0]
-        });
+module.controller('FavoritesController', function($scope) {
+	ons.ready(function() {
+	
+		$scope.content = {
+        	name: 'favorites'
+      	};
+	
+	});
+});
 
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          map: map,
-          title: 'Uluru (Ayers Rock)'
-        });
+module.controller('MarkerController', function($scope) {
+	ons.ready(function() {
+	// Init code here
+	});
+});
 
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.open(map,marker);
-        });
+module.controller('SettingsController', function($scope) {
+	ons.ready(function() {
+	// Init code here
+	});
+});
 
-        $scope.map = map;
-      }
-      google.maps.event.addDomListener(window, 'load', initialize);
-      
-      $scope.centerOnMe = function() {
-        if(!$scope.map) {
-          return;
-        }
 
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-          $scope.loading.hide();
-        }, function(error) {
-          alert('Unable to get location: ' + error.message);
-        });
-      };
-      
-      $scope.clickTest = function() {
-        alert('Example of infowindow with ng-click')
-      };
-      
-    });
+

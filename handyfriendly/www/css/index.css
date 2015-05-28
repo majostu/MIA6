@@ -33,7 +33,7 @@ body {
 	top: 0;
 	left: 0;
  	background-color: #25c2aa;
- 	border-bottom: 1px solid #fff;
+ 	border-bottom: 0;
  	color: #fff;
 }
 
@@ -72,11 +72,19 @@ body {
 	width: 100%;
 }
 
+.button-bar__button {
+	border: 0px solid #ddd;
+	border-top: 1px solid #ddd;
+	border-bottom: 0px;
+}
+
 .button-bar__item:first-child > .button-bar__button {
 	-webkit-border-top-left-radius: 0; 
 	border-top-left-radius: 0; 
 	-webkit-border-bottom-left-radius: 0;
 	border-bottom-left-radius: 0;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
 }
 
 .button-bar__item:last-child > .button-bar__button {
@@ -84,6 +92,17 @@ body {
 	border-top-right-radius: 0;
 	-webkit-border-bottom-right-radius: 0;
 	border-bottom-right-radius: 0;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+}
+
+.button-bar__item.active > .button-bar__button, :checked + .button-bar__button {
+	background-color: #ddd;
+	color: #7abfff;
+}
+
+.page__content {
+	margin-top: 0;
 }
 
 /*
@@ -176,4 +195,57 @@ body {
 
 .desc .active {
     color: #eeee6a;
+}
+
+/*
+ * SETTINGS
+ */
+
+.profile-wrapper {
+  	padding: 16px 10px 0 10px;
+}
+
+.profile-image {
+  	width: 50px;
+  	height: 50px;
+}
+
+.profile-name {
+  	font-size: 18px;
+  	padding: 4px 0 2px 0;
+}
+
+.profile-email {
+  	font-size: 15px;
+  	opacity: 0.4;
+}
+
+.switch--list-item {
+  	margin-right: 0px;
+}
+
+.settings-header {
+  	font-weight: 500;
+  	font-size: 14px;
+  	opacity: 0.4;
+  	padding: 10px 0 0px 10px;
+  	margin-bottom: -4px;
+}
+
+.settings-list {
+  	margin-top: 10px;
+}
+
+.range-list {
+  	text-align: center;
+}
+
+.settings-list .range {
+  	margin-top: 7px;
+  	width: 100%;
+}
+
+.lower {
+	opacity: 0.2;
+  	font-size: 14px;
 }

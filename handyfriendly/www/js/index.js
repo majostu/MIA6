@@ -38,13 +38,34 @@ module.controller('AppController', function($scope) {
 	// Init code here
 	});
 });
+
 module.controller('MapController', function($scope) {
 	ons.ready(function() {
 	// Init code here
 	});
 });
+
 module.controller('FavoritesController', function($scope) {
+	ons.ready(function() {
+	
+		$scope.content = {
+        	name: 'favorites'
+      	};
+	
+	});
+});
+
+module.controller('MarkerController', function($scope) {
 	ons.ready(function() {
 	// Init code here
 	});
 });
+
+module.controller('SettingsController', function($scope) {
+	ons.ready(function() {
+	// Init code here
+	});
+});
+
+
+

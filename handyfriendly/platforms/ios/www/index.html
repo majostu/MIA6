@@ -12,20 +12,14 @@
 <body ng-controller="AppController">
 	
 	<ons-sliding-menu var="menu" menu-page="menu.html" main-page="main.html" max-slide-distance="250px" type="reveal" side="right" swipeable="false"></ons-sliding-menu>  
-    
+    <!--========================================================================== 
+	MAIN
+    ==========================================================================--->
     <ons-template id="main.html">
-		<ons-navigator var="navigator">
+		<!--<ons-navigator var="mainNavigator">-->
 			<ons-page>
-				<ons-toolbar>
-					<div class="center">Handy Friendly</div>
-					<div class="right">
-						<ons-toolbar-button ng-click="menu.toggle()">
-							<ons-icon icon="bars"></ons-icon>
-						</ons-toolbar-button>
-					</div>
-				</ons-toolbar>
-				
-				<ons-tabbar var="tabbar">
+			
+				<ons-tabbar>
 				    <ons-tab page="map.html" active="true">
 				    	<ons-icon icon="ion-compass" class="tab-icon"></ons-icon>
 					</ons-tab>
@@ -38,39 +32,205 @@
 				</ons-tabbar>
 				
 			</ons-page>
-		</ons-navigator>
+		<!--</ons-navigator>-->
     </ons-template>
-    
+    <!--========================================================================== 
+	MAP 
+    ==========================================================================--->
     <ons-template id="map.html">
-    	<ons-page>
-    		<div id="map_canvas" data-tap-disabled="true"></div>
-			<br />
-			<div class="center" style="text-align: center;">
-				<!--<ons-button ng-click="navigator.pushPage('add-marker.html', { animation : 'slide' } )">Voeg wc toe</ons-button>-->
-				<ons-button ng-click="centerOnMe()">Mijn locatie</ons-button>
-			</div>
-    	</ons-page>
+    	<ons-navigator var="mapNavigator">
+	    	<ons-page ng-controller="MapController">
+	    		<ons-toolbar>
+					<div class="center">Handy Friendly</div>
+					<div class="right">
+						<ons-toolbar-button ng-click="menu.toggle()">
+							<ons-icon icon="bars"></ons-icon>
+						</ons-toolbar-button>
+					</div>
+				</ons-toolbar>
+	    		<div id="map">WC MAP</div>
+	    	</ons-page>
+    	</ons-navigator>
     </ons-template>
-
+	<!--===================================
+	ADD MARKER
+	===================================--->
 	<ons-template id="add-marker.html">
 		<ons-page>
 			<ons-toolbar>
 				<div class="left">
 					<ons-back-button>Back</ons-back-button>
 				</div>
-				<div class="center">Voeg WC toe</div>
+				<div class="center">Handy Friendly</div>
 			</ons-toolbar>
+			<div>WC TOEVOEGEN</div>
 		</ons-page>
 	</ons-template>
-	
+	<!--========================================================================== 
+	FAVORITES
+    ==========================================================================--->
+    <ons-template id="favorites.html">
+    	<ons-navigator var="favoritesNavigator">
+	    	<ons-page ng-controller="FavoritesController">
+	    		<ons-toolbar>
+					<div class="center">Handy Friendly</div>
+				</ons-toolbar>
+				<div class="button-bar">
+					<div class="button-bar__item">
+				    	<input type="radio" ng-model="content.name" value="favorites">
+				    	<button class="button-bar__button">Favorieten</button>
+				  	</div>
+				  	<div class="button-bar__item">
+				    	<input type="radio" ng-model="content.name" value="added">
+				    	<button class="button-bar__button">Toegevoegd</button>
+				  	</div>
+				</div>
+				<!--===================================
+				FAVORITE MARKERS
+				===================================--->
+				<ons-list ng-show="content.name == 'favorites'">
+				    <ons-list-item modifier="chevron" class="list-item-container" ng-click="favoritesNavigator.pushPage('marker.html', { animation : 'slide' })">
+					    <ons-row>
+						    <ons-col width="25%">
+							    <img src="img/logo.png" class="thumbnail">
+						    </ons-col>
+						    <ons-col width="50%">
+							    <div class="name">
+							    De Bijenkorf
+							    </div>
+							    <div class="location">
+								    <i class="fa fa-map-marker"></i> Eindhoven, Nederland
+							    </div>
+							    <div class="desc">
+			  				    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+							    </div>
+						    </ons-col>
+						    <ons-col width="25%"></ons-col>
+					    </ons-row>
+				    </ons-list-item>  
+			    </ons-list>
+				<!--===================================
+				ADDED MARKERS
+				===================================--->
+				<ons-list ng-show="content.name == 'added'">
+				    <ons-list-item modifier="chevron" class="list-item-container">
+					    <ons-row>
+						    <ons-col width="25%">
+							    <img src="img/logo.png" class="thumbnail">
+						    </ons-col>
+						    <ons-col width="50%">
+							    <div class="name">
+							    H&M
+							    </div>
+							    <div class="location">
+								    <i class="fa fa-map-marker"></i> Eindhoven, Nederland
+							    </div>
+							    <div class="desc">
+			  				    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+							    </div>
+						    </ons-col>
+						    <ons-col width="25%"></ons-col>
+					    </ons-row>
+				    </ons-list-item>  
+			    </ons-list>
+				
+	    	</ons-page>
+    	</ons-navigator>
+    </ons-template>
+    <!--========================================================================== 
+	MARKER
+    ==========================================================================--->
+    <ons-template id="marker.html">
+    	<ons-page ng-controller="MarkerController">
+    	
+    		<ons-toolbar>
+				<div class="left">
+					<ons-back-button>Back</ons-back-button>
+				</div>
+				<div class="center">Handy Friendly</div>
+			</ons-toolbar>
+			<div>WC PAGINA</div>
+    	</ons-page>
+    </ons-template>
+    <!--========================================================================== 
+	SETTINGS
+    ==========================================================================--->
+    <ons-template id="settings.html">
+    	<ons-page ng-controller="SettingsController">
+    	
+    		<ons-toolbar>
+				<div class="center">Handy Friendly</div>
+			</ons-toolbar>
+			
+			<ons-row class="profile-wrapper">
+				<ons-col width="60px" class="profile-image-wrapper">
+					<img src="img/logo.png" class="profile-image">
+				</ons-col>
+				<ons-col>
+					<div class="profile-name">Fontys Mobile Interaction</div>
+					<div class="profile-email">info@marijnstuyfzand.nl</div>
+				</ons-col>
+			</ons-row>
+
+			<!--<div class="settings-header">Settings</div>
+
+			<ons-list modifier="inset" class="settings-list">
+				<ons-list-item>
+					<ons-row>
+						<ons-col>
+							<ons-icon icon="fa-map-marker" class="lower"> Km/m radius</ons-icon>
+						</ons-col>
+					</ons-row>
+					<ons-row>
+						<ons-col>
+							<input type="range" value="10" class="range">
+						</ons-col>
+					</ons-row>
+				</ons-list-item>
+			</ons-list>-->
+
+			<div class="settings-header">Overig</div>
+
+			<ons-list modifier="inset" class="settings-list">
+				<ons-list-item modifier="chevron">
+					Terms of Use
+				</ons-list-item>
+
+				<ons-list-item modifier="chevron">
+					Privacy Policy
+				</ons-list-item>
+			</ons-list>
+			
+    	</ons-page>
+    </ons-template>
+    <!--========================================================================== 
+	MENU
+    ==========================================================================--->
 	<ons-template id="menu.html">
 		<ons-page modifier="menu-page">
+					
 			<ons-toolbar>
 				<div class="center">List view</div>
 			</ons-toolbar>
-			
+			<ons-list class="menu-list">	   
+				<ons-list-item class="menu-item" ng-click="mapNavigator.pushPage('add-marker.html', { animation : 'slide' }, menu.close())">
+					<ons-icon icon="fa-plus"></ons-icon>
+					Voeg wc toe
+				</ons-list-item>
+	    	</ons-list>
+			<!--===================================
+			LIST VIEW
+		    ===================================--->
 			<ons-list>
-			    <ons-list-item modifier="chevron" class="list-item-container">
+			    <ons-list-item modifier="chevron" class="list-item-container" ng-click="mapNavigator.pushPage('marker.html', { animation : 'slide' }, menu.close())">
 				    <ons-row>
 					    <ons-col width="35%">
 						    <img src="img/logo.png" class="thumbnail">
@@ -92,10 +252,8 @@
 					    </ons-col>
 					    <ons-col width="25%"></ons-col>
 				    </ons-row>
-			    </ons-list-item>  
-			    
+			    </ons-list-item>
 		    </ons-list>
-		    
 		</ons-page>
     </ons-template>
 	
