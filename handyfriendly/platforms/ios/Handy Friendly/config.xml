@@ -34,7 +34,6 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
-    <access origin="*" />
     <access origin="*.google.*" />
     <access origin="http://*.google.com" />
     <access origin="http://maps.google.com" />

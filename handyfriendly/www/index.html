@@ -40,6 +40,7 @@
     <ons-template id="map.html">
     	<ons-navigator var="mapNavigator">
 	    	<ons-page ng-controller="MapController">
+	    	
 	    		<ons-toolbar>
 					<div class="center">Handy Friendly</div>
 					<div class="right">
@@ -48,7 +49,13 @@
 						</ons-toolbar-button>
 					</div>
 				</ons-toolbar>
-	    		<div id="map">WC MAP</div>
+				
+	    		<div id="map_canvas" data-tap-disabled="true"></div
+	    		
+	    		<div class="center">
+	    			<ons-button ng-click="centerOnMe()">Mijn locatie</ons-button>
+	    		</div>
+	    		
 	    	</ons-page>
     	</ons-navigator>
     </ons-template>
@@ -77,18 +84,18 @@
 				</ons-toolbar>
 				<div class="button-bar">
 					<div class="button-bar__item">
-				    	<input type="radio" ng-model="content.name" value="favorites">
+				    	<input type="radio" name="fav_bar" ng-model="fav_bar.name" value="favorites">
 				    	<button class="button-bar__button">Favorieten</button>
 				  	</div>
 				  	<div class="button-bar__item">
-				    	<input type="radio" ng-model="content.name" value="added">
+				    	<input type="radio" name="fav_bar" ng-model="fav_bar.name" value="addedMarkers">
 				    	<button class="button-bar__button">Toegevoegd</button>
 				  	</div>
 				</div>
 				<!--===================================
 				FAVORITE MARKERS
 				===================================--->
-				<ons-list ng-show="content.name == 'favorites'">
+				<ons-list ng-show="fav_bar.name == 'favorites'">
 				    <ons-list-item modifier="chevron" class="list-item-container" ng-click="favoritesNavigator.pushPage('marker.html', { animation : 'slide' })">
 					    <ons-row>
 						    <ons-col width="25%">
@@ -116,7 +123,7 @@
 				<!--===================================
 				ADDED MARKERS
 				===================================--->
-				<ons-list ng-show="content.name == 'added'">
+				<ons-list ng-show="fav_bar.name == 'addedMarkers'">
 				    <ons-list-item modifier="chevron" class="list-item-container">
 					    <ons-row>
 						    <ons-col width="25%">
@@ -124,7 +131,7 @@
 						    </ons-col>
 						    <ons-col width="50%">
 							    <div class="name">
-							    H&M
+							    H&amp;M
 							    </div>
 							    <div class="location">
 								    <i class="fa fa-map-marker"></i> Eindhoven, Nederland
@@ -258,9 +265,11 @@
     </ons-template>
 	
 	<script type="text/javascript" src="cordova.js"></script>
-	<script type="text/javascript" src="components/onsenui/js/angular/angular.js"></script>    
+	<script type="text/javascript" src="components/angular/angular.js"></script>    
 	<script type="text/javascript" src="components/onsenui/js/onsenui.js"></script>
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeyepY1W5MQtdovxCS_6SWYouRGobAfz4&sensor=true"></script>
+	<!--<script type="text/javascript" src="components/lodash/dist/lodash.min.js"></script>
+	<script type="text/javascript" src="components/angular-google-maps/dist/angular-google-maps.min.js"></script>-->
 	<script type="text/javascript" src="js/index.js"></script>
 	
 </body>
