@@ -149,6 +149,14 @@ body {
     margin: 0; 
     padding: 0;  
 }
+
+#map_add_marker {
+	position: absolute;
+    width:100%; 
+    height: 100%; 
+    margin: 0; 
+    padding: 0;  
+}
  
 .angular-google-map-container {
 	position: absolute;
@@ -158,20 +166,20 @@ body {
     padding: 0;  
 }
 
-.par-buttons{
+.info-icon {
     position: absolute; 
-    text-align: center; 
-    width:100%; 
-    bottom:0px
+    text-align: right; 
+    width: 100%; 
+    z-index: 2;
+    font-size: 18px;
+    right: 12px;
+    bottom: 12px;
 }
 
-.btn-delete{
-    z-index:1
+.info-icon .tab-icon {
+	color: #8d8d8d;
 }
 
-.btn-distance{
-    z-index:1; margin-left: 5px;
-}
 /*
  * FAVORITES
  */
@@ -266,3 +274,215 @@ body {
 	opacity: 0.2;
   	font-size: 14px;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * MARKER
+ */
+  
+ #map_marker {
+	position: absolute;
+    width:100%; 
+    height: 200px; 
+    margin: 0; 
+    padding: 0;  
+    z-index: -1;
+}
+
+.map_overlay {
+    position:absolute;
+    left:0;
+    top:0;
+    background: rgba(0,0,0,0.5);
+    width:100%;
+    height:200px;
+}
+
+.gmnoprint a, .gmnoprint span {
+    display:none;
+}
+.gmnoprint div {
+    background:none !important;
+}
+
+
+.page--shop-details__content {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px !important;
+  bottom: 0px;
+}
+
+.card {
+  color: #fff;
+  height: 200px;
+}
+
+.card-toolbar ons-back-button span {
+  color: white;
+}
+
+.card-name {
+  font-weight: 600;
+  font-size: 20px;
+  padding-top: 66px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.card-desc {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.9;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.card-image {
+	padding-top: 10px;
+  	text-align: center;
+  	margin: 0 auto;
+  	opacity: 0.9;
+}
+
+.card-image img {
+	width: 50px;
+  	height: 50px;
+}
+
+.action-col {
+  text-align: center;
+  opacity: 0.4;
+  padding: 10px 0 8px;
+}
+
+.action-col:active {
+  opacity: 0.7;
+}
+
+.action-col ons-button {
+  padding: 0;
+  line-height: 1;
+}
+
+.action-icon {
+  padding: 0 0 4px 0;
+}
+
+.action-icon ons-icon {
+  font-size: 28px;
+}
+
+.action-label {
+  font-size: 12px;
+}
+
+
+.rating {
+  text-align: center;
+  position: relative;
+  height: 0px;
+}
+
+.rating-num {
+  position: relative;
+  top: -24px;
+  height: 24px;
+  color: white;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 4px 4px 0 0;
+  padding: 0 6px;
+  background-color: #25c2aa;
+  color: white;
+  width: auto;
+  margin: 0 auto 0 auto;
+  display: inline-block;
+}
+
+.rating-num ons-icon {
+  font-size: 14px;
+  vertical-align: -0px;
+}
+
+
+.prop-desc {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.prop-desc ons-icon {
+  font-size: 14px;
+  vertical-align: -0px;
+  opacity: 0.5;
+}
+
+.timeline {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.timeline-li {
+  line-height: 1;
+  padding: 10px;
+}
+
+.timeline-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+}
+
+.timeline-date {
+  float: right;
+  font-size: 12px;
+  opacity: 0.35;
+}
+
+.timeline-from {
+  margin: 10px 0 6px 0;
+}
+
+.timeline-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.timeline-id {
+  font-size: 14px;
+  opacity: 0.4;
+}
+
+.timeline-message {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.8;
+  line-height: 1.15;
+}
+
+
+ons-dialog p {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+input {
+  width: 100%;
+}
+
+
+
+
+

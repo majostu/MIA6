@@ -45,4 +45,11 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <feature name="Device">
+        <param name="ios-package" value="CDVDevice" />
+    </feature>
+    <feature name="UniqueDeviceID">
+        <param name="ios-package" value="CDVUniqueDeviceID" />
+        <param name="onload" value="true" />
+    </feature>
 </widget>

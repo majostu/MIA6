@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		1D3623260D0F684500981E51 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -45,6 +44,10 @@
 		7E7966E61810823500FA85AD /* icon-small.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E7966DC1810823500FA85AD /* icon-small.png */; };
 		7E7966E71810823500FA85AD /* icon-small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E7966DD1810823500FA85AD /* icon-small@2x.png */; };
 		D4A0D8761607E02300AEF8BB /* Default-568h@2x~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = D4A0D8751607E02300AEF8BB /* Default-568h@2x~iphone.png */; };
+		11427B9510F94B57A518BE54 /* CDVDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = A2D0E80DB7324A859716F6BC /* CDVDevice.m */; };
+		D97CEAACC6B34591A925DBEA /* UICKeyChainStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BC5A07708074B5E9562F5D3 /* UICKeyChainStore.m */; };
+		32F87E3F41F7443E92A24F9D /* CDVUniqueDeviceID.m in Sources */ = {isa = PBXBuildFile; fileRef = A508621D88424ADBA9ABA43E /* CDVUniqueDeviceID.m */; };
+		4DCADFA5946E49C1B11EA284 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB3574F7DC744D0E81F3EC5C /* Security.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +119,13 @@
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
 		F1431BABD1734B43A3E2C2DF /* CoreLocation.framework */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = "Handy Friendly/config.xml"; sourceTree = "<group>"; };
+		A2D0E80DB7324A859716F6BC /* CDVDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "CDVDevice.m"; path = "org.apache.cordova.device/CDVDevice.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		9B1544682CFA403787112EE9 /* CDVDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CDVDevice.h"; path = "org.apache.cordova.device/CDVDevice.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		7BC5A07708074B5E9562F5D3 /* UICKeyChainStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UICKeyChainStore.m"; path = "hu.dpal.phonegap.plugins.UniqueDeviceID/UICKeyChainStore.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		A508621D88424ADBA9ABA43E /* CDVUniqueDeviceID.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "CDVUniqueDeviceID.m"; path = "hu.dpal.phonegap.plugins.UniqueDeviceID/CDVUniqueDeviceID.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		DB27FF419A474B85A8A8EE0C /* UICKeyChainStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UICKeyChainStore.h"; path = "hu.dpal.phonegap.plugins.UniqueDeviceID/UICKeyChainStore.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		9BBEC14A9DCF449FB320EB91 /* CDVUniqueDeviceID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CDVUniqueDeviceID.h"; path = "hu.dpal.phonegap.plugins.UniqueDeviceID/CDVUniqueDeviceID.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		AB3574F7DC744D0E81F3EC5C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Security.framework"; path = "System/Library/Frameworks/Security.framework"; sourceTree = SDKROOT; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +139,7 @@
 				305D5FD1115AB8F900A74A75 /* MobileCoreServices.framework in Frameworks */,
 				464AB09614344306AC851D5B /* CoreMotion.framework in Frameworks */,
 				5C6639054873499E89CB6737 /* CoreLocation.framework in Frameworks */,
+				4DCADFA5946E49C1B11EA284 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +214,7 @@
 				305D5FD0115AB8F900A74A75 /* MobileCoreServices.framework */,
 				EAC229C3AA754BA3A2948216 /* CoreMotion.framework */,
 				F1431BABD1734B43A3E2C2DF /* CoreLocation.framework */,
+				AB3574F7DC744D0E81F3EC5C /* Security.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -224,6 +236,12 @@
 				68ADA64DB2104E3E9F5D7695 /* CDVCompass.h */,
 				DB229D7BDDE34A79B302BA85 /* CDVLocation.m */,
 				6FD8DE9A44D8496FBB91B8EC /* CDVLocation.h */,
+				A2D0E80DB7324A859716F6BC /* CDVDevice.m */,
+				9B1544682CFA403787112EE9 /* CDVDevice.h */,
+				7BC5A07708074B5E9562F5D3 /* UICKeyChainStore.m */,
+				A508621D88424ADBA9ABA43E /* CDVUniqueDeviceID.m */,
+				DB27FF419A474B85A8A8EE0C /* UICKeyChainStore.h */,
+				9BBEC14A9DCF449FB320EB91 /* CDVUniqueDeviceID.h */,
 			);
 			name = Plugins;
 			path = "Handy Friendly/Plugins";
@@ -411,6 +429,9 @@
 				7245AE8E418E4AA6B5090933 /* CDVAccelerometer.m in Sources */,
 				782E3643F7B64F9BBB18408F /* CDVCompass.m in Sources */,
 				6FBC720F6D634DC9A7FD1E05 /* CDVLocation.m in Sources */,
+				11427B9510F94B57A518BE54 /* CDVDevice.m in Sources */,
+				D97CEAACC6B34591A925DBEA /* UICKeyChainStore.m in Sources */,
+				32F87E3F41F7443E92A24F9D /* CDVUniqueDeviceID.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
