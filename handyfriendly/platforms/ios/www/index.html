@@ -27,7 +27,7 @@
 				    	<ons-icon icon="ion-star" class="tab-icon"></ons-icon>
 					</ons-tab>
 					<ons-tab page="settings.html">
-				    	<ons-icon icon="ion-settings" class="tab-icon"></ons-icon>
+				    	<ons-icon icon="cog" class="tab-icon"></ons-icon>
 					</ons-tab>
 				</ons-tabbar>
 				
@@ -42,6 +42,11 @@
 	    	<ons-page ng-controller="MapController">
 	    	
 	    		<ons-toolbar>
+	    			<div class="left">
+		    			<ons-toolbar-button ng-click="">
+							<ons-icon icon="fa-compass"></ons-icon>
+						</ons-toolbar-button>
+	    			</div>
 					<div class="center">Handy Friendly</div>
 					<div class="right">
 						<ons-toolbar-button ng-click="menu.toggle()">
@@ -50,8 +55,14 @@
 					</div>
 				</ons-toolbar>
 				
-	    		<div id="map_canvas" data-tap-disabled="true"></div
-	    			    		
+	    		<div id="map_canvas" data-tap-disabled="true"></div>
+	    		
+	    		<!--<p class="par-buttons">
+		            <ons-button class="btn-distance" ng-click="calculateDistance()">
+		                Distance      
+		            </ons-button>
+		        </p>--> 
+	
 	    	</ons-page>
     	</ons-navigator>
     </ons-template>
@@ -70,10 +81,19 @@
 						
 			<div id="map_add_marker" data-tap-disabled="true"></div>
 			
+			<!--<p class="par-buttons">
+	            <ons-button  class="btn-delete" ng-click="deleteAllMarkers()">
+	                Delete all markers        
+	            </ons-button>
+	            <ons-button class="btn-distance" ng-click="calculateDistance()">
+	                Distance      
+	            </ons-button>
+	        </p>-->
+			
 			<ons-col class="info-icon" ng-click="alert()" modifier="tappable">
 				<ons-icon icon="fa-info-circle" class="tab-icon"></ons-icon>
 			</ons-col>
-			
+		
 		</ons-page>
 	</ons-template>
 	<!--========================================================================== 
@@ -140,11 +160,11 @@
 								    <i class="fa fa-map-marker"></i> Eindhoven, Nederland
 							    </div>
 							    <div class="desc">
-			  				    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
-			                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
-			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
-			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
-			                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+				  				    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+				                    <ons-icon icon="ion-star" class="tab-icon active"></ons-icon>
+				                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+				                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+				                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
 							    </div>
 						    </ons-col>
 						    <ons-col width="25%"></ons-col>
@@ -173,13 +193,19 @@
 			  	<div class="map_overlay"></div>
 			  	<div class="card-name">H&amp;M</div>
 			  	<div class="card-desc">Eindhoven, Nederland</div>
+			  	<div class="card-extra">Vandaag geopend 12:00 - 18:00</div>
 			  	<div class="card-image"><img src="img/logo.png"></div>
 	        </div>
 	
-	        <div class="rating"><div class="rating-num">
-	            <ons-icon icon="ion-star" fixed-width="false"></ons-icon>
-	            <ons-icon icon="ion-star" fixed-width="false"></ons-icon>
-	        </div></div>
+	        <div class="rating">
+		        <div class="rating-num">
+		            <ons-icon icon="ion-star" class="active" fixed-width="false"></ons-icon>
+		            <ons-icon icon="ion-star" class="active" fixed-width="false"></ons-icon>
+		            <ons-icon icon="ion-star" fixed-width="false"></ons-icon>
+		            <ons-icon icon="ion-star" fixed-width="false"></ons-icon>
+		            <ons-icon icon="ion-star" fixed-width="false"></ons-icon>
+	        	</div>
+	        </div>
 		
 			<ons-list style="border-top: none">
 				<ons-list-item style="line-height: 1; padding: 0;">
@@ -229,16 +255,18 @@
 	COMMENT
 	===================================--->
     <ons-template id="comment.html">
-		<ons-dialog var="dialog" cancelable>
+		<ons-dialog var="dialog" cancelable ng-controller="CommentController">
 			
 			<ons-list>
 		    	<ons-list-header style="padding-top: 12px;">Geef een beoordeling:</ons-list-header>
 		        <ons-list-item class="desc" style="font-size: 14px; padding-top: 12px;">
-		        	<ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+		        	<!--<ons-icon icon="ion-star" class="tab-icon"></ons-icon>
                     <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
                     <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
                     <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
-                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>
+                    <ons-icon icon="ion-star" class="tab-icon"></ons-icon>-->
+                    <div star-rating ng-model="rating1" max="5" on-rating-selected="rateFunction(rating)"></div>
+                    
 		        </ons-list-item>
 
 		        <ons-list-header style="padding-top: 12px;">Geef een reactie:</ons-list-header>
@@ -383,9 +411,12 @@
 	<script type="text/javascript" src="cordova.js"></script>
 	<script type="text/javascript" src="components/angular/angular.js"></script>    
 	<script type="text/javascript" src="components/onsenui/js/onsenui.js"></script>
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeyepY1W5MQtdovxCS_6SWYouRGobAfz4&sensor=false"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeyepY1W5MQtdovxCS_6SWYouRGobAfz4&sensor=true"></script>
 	<!--<script type="text/javascript" src="components/lodash/dist/lodash.min.js"></script>
 	<script type="text/javascript" src="components/angular-google-maps/dist/angular-google-maps.min.js"></script>-->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/markclusterer.js"></script>
+	<script type="text/javascript" src="js/oms.min.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
 	
 </body>

@@ -147,15 +147,8 @@ body {
     width:100%; 
     height: 100%; 
     margin: 0; 
-    padding: 0;  
-}
-
-#map_add_marker {
-	position: absolute;
-    width:100%; 
-    height: 100%; 
-    margin: 0; 
-    padding: 0;  
+    padding: 0;
+    z-index: -1; 
 }
  
 .angular-google-map-container {
@@ -166,11 +159,57 @@ body {
     padding: 0;  
 }
 
+/*
+ * ADD MARKER
+ */
+ 
+ #map_add_marker {
+	position: absolute;
+    width:100%; 
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+    z-index: -1; 
+}
+
+div#map-info-window {
+	width: 250px;
+}
+
+div#map-info-window > div#map-info-window-inner h2 {
+	margin: 0;
+	padding: 0;
+}
+
+div#map-info-window > div#map-info-window-inner p {
+	margin: 0;
+	padding: 0;
+}
+
+div#map-info-window > div#map-info-window-inner ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+div#map-info-window > div#map-info-window-inner ul li {
+	display: inline;
+}
+
+
+div#map-info-window > div#map-info-window-inner ul li i {
+    color: #8d8d8d;
+}
+
+div#map-info-window > div#map-info-window-inner ul li i.active {
+    color: #eeee6a;
+}
+
 .info-icon {
     position: absolute; 
     text-align: right; 
     width: 100%; 
-    z-index: 2;
+    z-index: 1;
     font-size: 18px;
     right: 12px;
     bottom: 12px;
@@ -179,6 +218,22 @@ body {
 .info-icon .tab-icon {
 	color: #8d8d8d;
 }
+
+/*.par-buttons{
+    position: absolute; 
+    text-align: center; 
+    width:100%; 
+    bottom:0px
+}
+
+.btn-delete{
+    z-index: 2;
+}
+
+.btn-distance{
+    z-index: 2; 
+    margin-left: 5px;
+}*/
 
 /*
  * FAVORITES
@@ -292,7 +347,7 @@ body {
  #map_marker {
 	position: absolute;
     width:100%; 
-    height: 200px; 
+    height: 250px; 
     margin: 0; 
     padding: 0;  
     z-index: -1;
@@ -304,7 +359,7 @@ body {
     top:0;
     background: rgba(0,0,0,0.5);
     width:100%;
-    height:200px;
+    height:250px;
 }
 
 .gmnoprint a, .gmnoprint span {
@@ -325,7 +380,7 @@ body {
 
 .card {
   color: #fff;
-  height: 200px;
+  height: 250px;
 }
 
 .card-toolbar ons-back-button span {
@@ -341,7 +396,15 @@ body {
 }
 
 .card-desc {
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0.9;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.card-extra {
+  font-size: 12px;
   font-weight: 400;
   opacity: 0.9;
   text-align: center;
@@ -349,7 +412,7 @@ body {
 }
 
 .card-image {
-	padding-top: 10px;
+	padding-top: 22px;
   	text-align: center;
   	margin: 0 auto;
   	opacity: 0.9;
@@ -415,6 +478,11 @@ body {
 .rating-num ons-icon {
   font-size: 14px;
   vertical-align: -0px;
+  color: #8d8d8d;
+}
+
+.rating-num ons-icon.active {
+  color: #fff;
 }
 
 
@@ -480,6 +548,28 @@ ons-dialog p {
 
 input {
   width: 100%;
+}
+
+
+
+
+.rating-stars {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+ 
+.rating-stars li {
+    padding: 1px;
+    color: #8d8d8d;
+    font-size: 20px;
+    list-style-type: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.rating-stars li.filled {
+   	color: #eeee6a; //#21568b
 }
 
 
