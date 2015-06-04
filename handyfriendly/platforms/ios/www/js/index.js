@@ -65,24 +65,11 @@ module.controller('MapController', function($scope, $compile) {
 	        console.log('map: ', maps);
 	    });*/
 	    
-	    var json = (function () {
-			var json = null;
-			$.ajax({
-				'async': false,
-				'global': false,
-				'url': "markers.json",
-				'dataType': "json",
-				'success': function (data) {
-					json = data;
-				}
-			});
-			return json;
-		})();
 	    
 	    function geoLocation() {
-	    	
-		    var options = { frequency: 5000, enableHighAccuracy: true};
-			watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+	    
+		    var options = { enableHighAccuracy: true};
+			watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
 		    
 		    function onSuccess(position) {
 				var lat = position.coords.latitude;
@@ -107,98 +94,17 @@ module.controller('MapController', function($scope, $compile) {
 				var infowindow = new google.maps.InfoWindow({
 					content: compiled[0]
 		    	});
-				var iconBase = 'img/';
+		
 				var marker = new google.maps.Marker({
 					position: myLatlng,
 					map: map,
-					title: 'Mijn locatie',
-					optimized: false,
-					icon: iconBase + 'wheelchair.png'
+					title: 'Mijn locatie'
 		    	});
 		
-				/*google.maps.event.addListener(marker, 'click', function() {
+				google.maps.event.addListener(marker, 'click', function() {
 					infowindow.open(map,marker);
-		    	});*/
-		    			    	
-		    	var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true, keepSpiderfied: true, nearbyDistance: 20, legWeight: 1});
-				var infoWindow = new google.maps.InfoWindow();
-				
-				for (var i = 0; i < json.length; i ++) {
-					var data = json[i];
-					var loc = new google.maps.LatLng(data.latitude, data.longitude);
-					var iconBase = 'img/';
-					if (data.type == 1 && data.rating <= 1)  {						
-						var marker = new google.maps.Marker({
-							position: loc,
-							title: data.jobtitle,
-							map: map,
-							icon: iconBase + 'markerbad.png'
-						});	
-					} else if (data.type == 1 && data.rating <= 3)  {						
-						var marker = new google.maps.Marker({
-							position: loc,
-							title: data.jobtitle,
-							map: map,
-							icon: iconBase + 'markermedium.png'
-						});	
-					} else if (data.type == 1 && data.rating >= 4)  {						
-						var marker = new google.maps.Marker({
-							position: loc,
-							title: data.jobtitle,
-							map: map,
-							icon: iconBase + 'markergood.png'
-						});	
-					} else if (data.type == 2)  {						
-						var marker = new google.maps.Marker({
-							position: loc,
-							title: data.jobtitle,
-							map: map,
-							icon: iconBase + 'markeradd.png'
-						});	
-					} 		
-					
-					marker.desc = data.name;
-					oms.addMarker(marker);
-					infoBox(map, marker, data);
-				}
+		    	});
 		
-				function infoBox(map, marker, data) {
-					oms.addListener('click', function(marker, event) {
-						infoWindow.setContent(marker.desc);
-						infoWindow.open(map, marker);
-					});
-			
-					oms.addListener('spiderfy', function(markers) {
-						infoWindow.close();
-					});
-			
-					(function(marker, data) {
-						google.maps.event.addListener(marker, "click", function(e) {		
-										
-								var contentString = 
-									'<div id="map-info-window">'+
-										'<div id="map-info-window-inner">'+
-											'<p><b>'+ data.name +'</b></p>'+
-											'<p>' + data.address + ', ' + data.zip +', ' + data.city +', ' + data.country +'</p>' +
-											'<ul>' +
-												'<li><i class="ion-star active"></i></li>' +
-												'<li><i class="ion-star active"></i></li>' +
-												'<li><i class="ion-star"></i></li>' +
-												'<li><i class="ion-star"></i></li>' +
-												'<li><i class="ion-star"></i></li>' +
-											'</ul>' +
-											'<p><button><i class="fa fa-compass"></i> Routebeschrijving</button>'+
-											'<button ng-click="mapNavigator.pushPage("marker.html", { animation : "slide" })"><i class="fa fa-info-circle"></i> Informatie</button></p>'+
-										'</div>'+
-									'</div>'									
-								;
-
-							infoWindow.setContent(contentString);
-							infoWindow.open(map, marker);
-						});
-					})(marker, data);
-  				}
-		    	
 				$scope.map = map;				
 			}
 			
@@ -210,7 +116,7 @@ module.controller('MapController', function($scope, $compile) {
 		}
 	    	
 	  	google.maps.event.addDomListener(window, 'load', geoLocation());
-	  	   
+      
 	  	/*$scope.centerOnMe = function() {
         	if(!$scope.map) {
 				return;
@@ -241,8 +147,8 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 		
 		function geoAddMarker() {
 	    
-		    var options = { frequency: 5000, enableHighAccuracy: true};
-			watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+		    var options = { enableHighAccuracy: true};
+			watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
 		    
 		    function onSuccess(position) {
 				var lat = position.coords.latitude;
@@ -275,8 +181,7 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 				var marker = new google.maps.Marker({
 					position: latlng,
 					map: $scope.map,
-					title: 'Mijn locatie',
-					optimized: false
+					title: 'Mijn locatie'
 		    	});
 		
 				google.maps.event.addListener(marker, 'click', function() {
@@ -287,7 +192,7 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 	            $scope.overlay.draw = function() {}; // empty function required
 	            $scope.overlay.setMap($scope.map);
 	            $scope.element = document.getElementById('map_add_marker');
-	            $scope.hammertime = Hammer($scope.element).on("doubletap", function(event) {
+	            $scope.hammertime = Hammer($scope.element).on("tap", function(event) {
 	                $scope.addOnClick(event);
 	            });
 		
@@ -384,8 +289,7 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 		
 		            var marker = new google.maps.Marker({
 		                position: coordinates,
-		                map: $scope.map,
-		                optimized: false
+		                map: $scope.map
 		            });
 		
 		            marker.id = $scope.markerId;
@@ -424,14 +328,17 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 	                    }
 	                });
 		            		
-		            $timeout(function(){
+		            /*$timeout(function(){
 		                //Creation of the listener associated to the Markers click
 			            google.maps.event.addListener(marker, "click", function (e) {
 			                ons.notification.confirm({
-			                    message: 'Weet je zeker dat je deze wc locatie wilt verwijderen?',
+			                    message: 'Do you want to delete the marker?',
 			                    callback: function(idx) {
 			                        switch(idx) {
 			                            case 0:
+			                                ons.notification.alert({
+			                                    message: 'You pressed "Cancel".'
+			                                });
 			                                break;
 			                            case 1:
 			                                for (var i = 0; i < $scope.markers.length; i++) {
@@ -444,16 +351,14 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 			                                    }
 			                                }
 			                                ons.notification.alert({
-				                                messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
-												title: 'WC verwijderd',
-												buttonLabel: 'OK'
+			                                    message: 'Marker deleted.'
 			                                });
 			                                break;
 			                        }
 			                    }
 			                });   
 			            });
-		            },1000);
+		            },1000);*/
 		        };
 		        				
 			}
@@ -470,7 +375,7 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 	  	$scope.alert = function() {
 	    	ons.notification.alert({
 				//message: 'Message',
-				message: 'Dubbel tap op een locatie om een wc toe te voegen.',
+				message: 'Tap op een locatie om een wc toe te voegen.',
 				title: 'Info',
 				buttonLabel: 'OK',
 				animation: 'default', // or 'none'
@@ -547,61 +452,9 @@ module.controller('MarkerController', function($scope) {
 	    	} else {
 				$scope.dialogs[dlg].show();
 	    	}
-  		}
+  		}	
 			
 	});
-});
-
-module.controller('CommentController', function($scope) {
-	ons.ready(function() {
-		
-		$scope.rating1 = 1;
-  		$scope.isReadonly = true;
-  		$scope.rateFunction = function(rating) {
-  			console.log("Rating selected: " + rating);
-  		};
-		
-	});
-});
-
-module.directive("starRating", function() {
-		return {
-			restrict : "EA",
-				template : "<ul class='rating-stars' ng-class='{readonly: readonly}'>" +
-				"  <li ng-repeat='star in stars' ng-class='star' ng-click='toggle($index)'>" +
-				"    <i class='ion-star'></i>" + //&#9733
-				"  </li>" +
-				"</ul>",
-				
-			scope : {
-				ratingValue : "=ngModel",
-				max : "=?", //optional: default is 5
-				onRatingSelected : "&?",
-				readonly: "=?"
-		},
-		link : function(scope, elem, attrs) {
-			if (scope.max == undefined) { scope.max = 5; }
-			function updateStars() {
-				scope.stars = [];
-				for (var i = 0; i < scope.max; i++) {
-					scope.stars.push({
-						filled : i < scope.ratingValue
-						});
-				}
-				};
-				scope.toggle = function(index) {
-					if (scope.readonly == undefined || scope.readonly == false){
-						scope.ratingValue = index + 1;
-						scope.onRatingSelected({
-							rating: index + 1
-						});
-				}
-				};
-				scope.$watch("ratingValue", function(oldVal, newVal) {
-					if (newVal) { updateStars(); }
-				});
-			}
-		};
 });
 
 module.controller('SettingsController', function($scope) {

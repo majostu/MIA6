@@ -20,57 +20,23 @@ var app = {
 
 app.initialize();
 
-var module = angular.module('handyfriendly', ['onsen']); //'uiGmapgoogle-maps'
+var module = angular.module('handyfriendly', ['onsen']);
 
 module.controller('AppController', function($scope) { 
 	ons.ready(function() {
-	
-	
 		
-		
-    	/*window.plugins.uniqueDeviceID.get(success, fail);
-	
-		function success(uuid) {
-		    console.log(uuid);
-		};*/
-		
-	
-	
-	
 	});
 });
 
-/*module.config(function(uiGmapGoogleMapApiProvider) {
-    uiGmapGoogleMapApiProvider.configure({
-        key: 'AIzaSyBeyepY1W5MQtdovxCS_6SWYouRGobAfz4',
-        v: '3.17',
-        libraries: 'weather,geometry,visualization'
-    });
-});*/
-
 module.controller('MapController', function($scope, $compile) {
 	ons.ready(function() {
-		
-		
-					
-	    /*uiGmapGoogleMapApi.then(function(maps) {
-	        $scope.map = { 
-		        center: { 
-			        latitude: 51.441642, 
-			        longitude: 5.469722 
-			    }, 
-				zoom: 8,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			};
-	        console.log('map: ', maps);
-	    });*/
-	    
+			    
 	    var json = (function () {
 			var json = null;
 			$.ajax({
 				'async': false,
 				'global': false,
-				'url': "markers.json",
+				'url': "/php/getdata.php",
 				'dataType': "json",
 				'success': function (data) {
 					json = data;
@@ -155,7 +121,7 @@ module.controller('MapController', function($scope, $compile) {
 							map: map,
 							icon: iconBase + 'markeradd.png'
 						});	
-					} 		
+					}	
 					
 					marker.desc = data.name;
 					oms.addMarker(marker);
@@ -271,12 +237,16 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 				var infowindow = new google.maps.InfoWindow({
 					content: compiled[0]
 		    	});
-		
+		    	
+		    	
+		    	var iconBase = 'img/';
+								
 				var marker = new google.maps.Marker({
 					position: latlng,
 					map: $scope.map,
 					title: 'Mijn locatie',
-					optimized: false
+					optimized: false,
+					icon: iconBase + 'wheelchair.png'
 		    	});
 		
 				google.maps.event.addListener(marker, 'click', function() {
@@ -381,13 +351,15 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 		            var y = event.gesture.center.pageY-44;
 		            var point = new google.maps.Point(x, y);
 		            var coordinates = $scope.overlay.getProjection().fromContainerPixelToLatLng(point);
-		
+					
+					var iconBase = 'img/';
 		            var marker = new google.maps.Marker({
 		                position: coordinates,
 		                map: $scope.map,
-		                optimized: false
+		                optimized: false,
+		                icon: iconBase + 'markerunrated.png'
 		            });
-		
+		           		            
 		            marker.id = $scope.markerId;
 		            $scope.markerId++;
 		            $scope.markers.push(marker);
@@ -483,16 +455,6 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 			
 	});
 });
-
-
-	
-	
-	
-	
-	
-	
-	
-	
 
 module.controller('FavoritesController', function($scope) {
 	ons.ready(function() {
