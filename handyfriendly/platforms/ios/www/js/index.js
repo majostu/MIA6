@@ -20,56 +20,56 @@ var app = {
 
 app.initialize();
 
-var module = angular.module('handyfriendly', ['onsen']); //'uiGmapgoogle-maps'
+var module = angular.module('handyfriendly', ['onsen', 'LocalStorageModule']);
 
-module.controller('AppController', function($scope) { 
+module.config(function (localStorageServiceProvider, $httpProvider) {
+  	localStorageServiceProvider
+    .setPrefix('handyfriendly');
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+    $httpProvider.defaults.headers.post['Accept'] = 'application/json, text/javascript';
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
+    $httpProvider.defaults.headers.post['Access-Control-Max-Age'] = '1728000';
+    $httpProvider.defaults.headers.common['Access-Control-Max-Age'] = '1728000';
+    $httpProvider.defaults.headers.common['Accept'] = 'application/json, text/javascript';
+    $httpProvider.defaults.headers.common['Content-Type'] = 'application/json; charset=utf-8';
+    $httpProvider.defaults.useXDomain = true;
+});
+
+module.controller('AppController', function($scope, localStorageService) { 
 	ons.ready(function() {
-	
-	
 		
+		if(localStorageService.isSupported) {
+			console.log('storage supported: yes; type: local storage');
+		}
 		
-    	/*window.plugins.uniqueDeviceID.get(success, fail);
-	
-		function success(uuid) {
-		    console.log(uuid);
-		};*/
-		
-	
-	
-	
 	});
 });
 
-/*module.config(function(uiGmapGoogleMapApiProvider) {
-    uiGmapGoogleMapApiProvider.configure({
-        key: 'AIzaSyBeyepY1W5MQtdovxCS_6SWYouRGobAfz4',
-        v: '3.17',
-        libraries: 'weather,geometry,visualization'
-    });
-});*/
-
-module.controller('MapController', function($scope, $compile) {
+module.controller('MapController', function($scope, $compile, localStorageService) {
 	ons.ready(function() {
-		
-		
-					
-	    /*uiGmapGoogleMapApi.then(function(maps) {
-	        $scope.map = { 
-		        center: { 
-			        latitude: 51.441642, 
-			        longitude: 5.469722 
-			    }, 
-				zoom: 8,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			};
-	        console.log('map: ', maps);
-	    });*/
-	    
-	    
+			    
+	    var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_toilets: "all"
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+			    
 	    function geoLocation() {
-	    
-		    var options = { enableHighAccuracy: true};
-			watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
+	    	
+		    var options = { frequency: 5000, enableHighAccuracy: true};
+			watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 		    
 		    function onSuccess(position) {
 				var lat = position.coords.latitude;
@@ -77,6 +77,12 @@ module.controller('MapController', function($scope, $compile) {
 				
 				localStorage.setItem("latitude", lat);
 				localStorage.setItem("longitude", lng);
+				
+				$scope.markers = [];
+		        $scope.markerId = 1;
+		        
+		        $scope.mymarker = [];
+		        $scope.mymarkerId = 1;
 				
 				var myLatlng = new google.maps.LatLng(lat, lng);
 	    
@@ -86,6 +92,7 @@ module.controller('MapController', function($scope, $compile) {
 					mapTypeId: google.maps.MapTypeId.ROADMAP,
 					disableDefaultUI: true
 		    	};
+		    	
 				var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 		    
 				var contentString = "<div><a ng-click='clickTest()'>Mijn locatie</a></div>";
@@ -94,138 +101,241 @@ module.controller('MapController', function($scope, $compile) {
 				var infowindow = new google.maps.InfoWindow({
 					content: compiled[0]
 		    	});
-		
-				var marker = new google.maps.Marker({
+				var iconBase = 'img/';
+				var MyMarker = new google.maps.Marker({
 					position: myLatlng,
 					map: map,
-					title: 'Mijn locatie'
+					title: 'Mijn huidige locatie',
+					optimized: false,
+					icon: iconBase + 'wheelchair.png'
 		    	});
-		
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.open(map,marker);
+		    			    	
+				google.maps.event.addListener(MyMarker, 'click', function() {
+					infowindow.open(map,MyMarker);
 		    	});
-		
-				$scope.map = map;				
-			}
-			
-			function onError(error) {
-				alert("message: " + error.message);
-				localStorage.setItem("message", error.message);
-			}
-		
-		}
-	    	
-	  	google.maps.event.addDomListener(window, 'load', geoLocation());
-      
-	  	/*$scope.centerOnMe = function() {
-        	if(!$scope.map) {
-				return;
-        	}
-
-			$scope.loading = $ionicLoading.show({
-				content: 'Getting current location...',
-				showBackdrop: false
-        	});
-
-			navigator.geolocation.getCurrentPosition(function(pos) {				
-				$scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));				
-				//$scope.loading.hide();
-        	}, function(error) {
-				alert('Unable to get location: ' + error.message);
-        	});
-      	};
-      
-	  	$scope.clickTest = function() {
-        	alert('Example of infowindow with ng-click')
-      	};*/
-			
-	});
-});
-
-module.controller('AddMarkerController', function($scope, $compile, $timeout) {
-	ons.ready(function() {
-		
-		function geoAddMarker() {
-	    
-		    var options = { enableHighAccuracy: true};
-			watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
-		    
-		    function onSuccess(position) {
-				var lat = position.coords.latitude;
-				var lng = position.coords.longitude;
+		    	
+		    	MyMarker.id = $scope.mymarkerId;
+				$scope.mymarkerId++;
+				$scope.mymarker.push(MyMarker);
+		    			    	
+		    	var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true, keepSpiderfied: true, nearbyDistance: 20, legWeight: 1});
+				var infoWindow = new google.maps.InfoWindow();
 				
-				localStorage.setItem("latitude", lat);
-				localStorage.setItem("longitude", lng);
+				for (var i = 0; i < json.length; i ++) {
+					var data = json[i];
+					var loc = new google.maps.LatLng(data.latitude, data.longitude);
+					var iconBase = 'img/';
+					if (data.type == 2 && data.rating <= 1)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markerbad.png'
+						});							
+					} else if (data.type == 2 && data.rating <= 3)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markermedium.png'
+						});							
+					} else if (data.type == 2 && data.rating >= 4)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markergood.png'
+						});							
+					} 
+					
+					WCMarker.desc = data.name;
+					oms.addMarker(WCMarker);
+					infoBox(map, WCMarker, data);
+					
+					WCMarker.id = $scope.markerId;
+					$scope.markerId++;
+					$scope.markers.push(WCMarker);
+				}
+		
+				function infoBox(map, WCMarker, data) {
+					oms.addListener('click', function(WCMarker, event) {
+						infoWindow.setContent(WCMarker.desc);
+						infoWindow.open(map, WCMarker);
+					});
+			
+					oms.addListener('spiderfy', function(WCMarker) {
+						infoWindow.close();
+					});
+			
+					(function(WCMarker, data) {
+						google.maps.event.addListener(WCMarker, "click", function(e) {		
+																
+								if (data.rating == 1)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 2)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 3)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 4)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 5)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li>';
+								} else if (data.rating == 0)  {						
+									var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								}  
 								
-				$scope.map;
-		        $scope.markers = [];
-		        $scope.markerId = 1;
+								var markerData = 
+									'<div id="map-info-window">'+
+										'<div id="map-info-window-inner">'+
+											'<p><b>'+ data.name +'</b></p>'+
+											'<p>' + data.address + '</p>' +
+											'<ul>' + rating_star + '</ul>' +
+											'<p>' +
+												'<div class="button-bar" style="border-bottom: 1px solid #ddd;">' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+												'</div>' +
+											'</p>' +
+										'</div>'+
+									'</div>'									
+								;
+								
+								var compiledMarker = $compile(markerData)($scope);
 
-	            var latlng = new google.maps.LatLng(lat, lng);
-	            var myOptions = {
-	                zoom: 16,
-	                center: latlng,
-	                mapTypeId: google.maps.MapTypeId.ROADMAP,
-	                disableDefaultUI: true
-	            };
-	            
-	            $scope.map = new google.maps.Map(document.getElementById("map_add_marker"), myOptions); 
-	            
-	            var contentString = "<div><a ng-click='clickTest()'>Mijn locatie</a></div>";
-				var compiled = $compile(contentString)($scope);
+							infoWindow.setContent(compiledMarker[0]);
+							infoWindow.open(map, WCMarker);
+						});
+					})(WCMarker, data);
+					
+					
+					$scope.pushPage = function(id) {
+												
+						var json = (function () {
+							var json = null;
+							$.ajax({
+								'type':'GET',
+								'async': false,
+								'global': false,
+								'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+								'dataType': "json",
+								'data': $.param({ 
+									get_profile: id
+								}),
+								'success': function (data) {
+									json = data;
+								}
+							});
+							return json;							
+						})();
+												
+						var profile_id = json.variables.id;
+						
+						localStorage.setItem("profile_id", profile_id);
+						
+		  				mapNavigator.pushPage("marker.html", { animation : "slide" });
+		  					  				
+	  				};
+									
+					$scope.deleteMarker = function(id){
+		                ons.notification.confirm({
+			                title: 'Bevestiging',
+		                    message: 'Weet je zeker dat je deze WC wilt verwijderen?',
+		                    callback: function(idx) {
+		                        switch(idx) {
+		                            case 0:
+		                            
+		                                break;
+		                            case 1:
+		                            
+		                                /*for (var i = 0; i < $scope.markers.length; i++) {
+		                                    if ($scope.markers[i].id == WCMarker.id) {
+		                                        //Remove the marker from Map                  
+		                                        $scope.markers[i].setMap(null);
 		
-				var infowindow = new google.maps.InfoWindow({
-					content: compiled[0]
-		    	});
-		
-				var marker = new google.maps.Marker({
-					position: latlng,
-					map: $scope.map,
-					title: 'Mijn locatie'
-		    	});
-		
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.open($scope.map,marker);
-		    	});
-	            
-	            $scope.overlay = new google.maps.OverlayView();
-	            $scope.overlay.draw = function() {}; // empty function required
-	            $scope.overlay.setMap($scope.map);
-	            $scope.element = document.getElementById('map_add_marker');
-	            $scope.hammertime = Hammer($scope.element).on("tap", function(event) {
-	                $scope.addOnClick(event);
-	            });
-		
-		        /*//Delete all Markers
-		        $scope.deleteAllMarkers = function(){
-		
-		            if($scope.markers.length == 0){
-		                ons.notification.alert({
-		                    message: 'There are no markers to delete!!!'
-		                });
-		                return;
-		            }
-		
-		            for (var i = 0; i < $scope.markers.length; i++) {
-		
-		                //Remove the marker from Map                  
-		                $scope.markers[i].setMap(null);
-		            }
-		
-		            //Remove the marker from array.
-		            $scope.markers.length = 0;
-		            $scope.markerId = 0;
-		
-		            ons.notification.alert({
-		                message: 'All Markers deleted.'
-		            });   
-		        };
-		
-		        $scope.rad = function(x) {
+		                                        //Remove the marker from array.
+		                                        $scope.markers.splice(i, 1);
+		                                    }
+		                                }*/
+      		                                
+		                                var json = (function () {
+											var json = null;
+											$.ajax({
+												'type':'GET',
+												'async': false,
+												'global': false,
+												'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+												'dataType': "json",
+												'data': $.param({ 
+													delete_id: id
+												}),
+												'success': function (data) {
+													json = data;
+												}
+											});
+											return json;
+										})();
+												                               	
+		                                ons.notification.alert({
+			                                messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+											title: 'WC verwijderd',
+											buttonLabel: 'OK',
+											callback: function() {
+														
+												localStorage.removeItem("profile_id");
+												location.reload();
+
+											}
+		                                });
+		                                
+		                                break;
+		                        }
+		                    }
+		                });   
+			        };					
+					
+  				}
+  				  				  				
+				$scope.map = map;
+				
+				/*var markers_data = $scope.markers;
+				var mymarker_data = $scope.mymarker;
+				
+				var latLngA = [];
+				var latLngB = [];
+				
+				for (var i = 0; i < mymarker_data.length; i ++) {
+					var data = mymarker_data[i];
+										
+					latLngA.push(data.position.A, data.position.F);
+					
+				}
+				
+				for (var i = 0; i < markers_data.length; i ++) {
+					var data = markers_data[i];
+										
+					latLngB.push(data.position.A, data.position.F);
+					
+				}
+				
+				console.log(latLngA);
+				console.log(latLngB);
+								
+				var iets = google.maps.geometry.spherical.computeDistanceBetween (latLngA, latLngB);
+				
+				console.log(iets);*/
+				
+				/*$scope.rad = function(x) {
 		            return x * Math.PI / 180;
 		        };
-		
-		        //Calculate the distance between the Markers
+				
+				//Calculate the distance between the Markers
 		        $scope.calculateDistance = function(){
 		
 		            if($scope.markers.length < 2){
@@ -239,8 +349,8 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 		                partialDistance.length = $scope.markers.length - 1;
 		
 		                for(var i = 0; i < partialDistance.length; i++){
-		                    var p1 = $scope.markers[i];
-		                    var p2 = $scope.markers[i+1];
+		                    var p1 = $scope.mymarker[i];
+		                    var p2 = $scope.markers[i];
 		
 		                    var R = 6378137; // Earth’s mean radius in meter
 		                    var dLat = $scope.rad(p2.position.lat() - p1.position.lat());
@@ -278,24 +388,329 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 		                    }
 		                });
 		            }
-		        };*/
+		        };
+		        
+		        $scope.calculateDistance();*/
+																					
+			}
+			
+			function onError(error) {
+				alert("message: " + error.message);
+				localStorage.setItem("message", error.message);
+			}
 		
+		}
+	    	
+	  	google.maps.event.addDomListener(window, 'load', geoLocation());
+	  		  	   
+	  	$scope.centerOnMe = function() {
+        	if(!$scope.map) {
+				return;
+        	}
+
+			navigator.geolocation.getCurrentPosition(function(position) {				
+				$scope.map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));				
+        	}, function(error) {
+				alert('Unable to get location: ' + error.message);
+        	});
+      	};
+      		
+	});
+});
+
+module.controller('AddMarkerController', function($scope, $compile, localStorageService, $http) {
+	ons.ready(function() {
+		
+		$scope.dialogs = {};
+   
+		$scope.AddMarkerShow = function(dlg) {
+			if (!$scope.dialogs[dlg]) {
+		    	ons.createDialog(dlg).then(function(dialog) {
+		        	$scope.dialogs[dlg] = dialog;
+					dialog.show();
+		      	});
+		   	}
+		    else {
+		    	$scope.dialogs[dlg].show();
+		    }
+		}
+		
+		var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_toilets: "all"
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+				
+		function geoAddMarker() {
+	    
+		    var options = { frequency: 5000, enableHighAccuracy: true};
+			watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+		    
+		    function onSuccess(position) {
+				var lat = position.coords.latitude;
+				var lng = position.coords.longitude;
+				
+				localStorage.setItem("latitude", lat);
+				localStorage.setItem("longitude", lng);
+								
+				$scope.map;
+		        $scope.markers = [];
+		        $scope.markerId = 1;
+
+	            var latlng = new google.maps.LatLng(lat, lng);
+	            var myOptions = {
+	                zoom: 16,
+	                center: latlng,
+	                mapTypeId: google.maps.MapTypeId.ROADMAP,
+	                disableDefaultUI: true
+	            };
+	            
+	           var map = new google.maps.Map(document.getElementById("map_add_marker"), myOptions); 
+	            
+	            var contentString = "<div><a ng-click='clickTest()'>Mijn locatie</a></div>";
+				var compiled = $compile(contentString)($scope);
+		
+				var infowindow = new google.maps.InfoWindow({
+					content: compiled[0]
+		    	});
+		    			    	
+		    	var iconBase = 'img/';
+								
+				var marker = new google.maps.Marker({
+					position: latlng,
+					map: map,
+					title: 'Mijn locatie',
+					optimized: false,
+					icon: iconBase + 'wheelchair.png'
+		    	});
+		
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.open($map,marker);
+		    	});
+		        
+	            $scope.overlay = new google.maps.OverlayView();
+	            $scope.overlay.draw = function() {}; // empty function required
+	            $scope.overlay.setMap(map);
+	            $scope.element = document.getElementById('map_add_marker');
+	            $scope.hammertime = Hammer($scope.element).on("doubletap", function(event) {
+	                $scope.addOnClick(event);
+	            });
+	            
+	            var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true, keepSpiderfied: true, nearbyDistance: 20, legWeight: 1});
+				var infoWindow = new google.maps.InfoWindow();
+				
+				for (var i = 0; i < json.length; i ++) {
+					var data = json[i];
+					var loc = new google.maps.LatLng(data.latitude, data.longitude);
+					var iconBase = 'img/';
+					if (data.type == 2 && data.rating <= 1)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markerbad.png'
+						});							
+					} else if (data.type == 2 && data.rating <= 3)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markermedium.png'
+						});							
+					} else if (data.type == 2 && data.rating >= 4)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							icon: iconBase + 'markergood.png'
+						});							
+					}
+					
+					WCMarker.desc = data.name;
+					oms.addMarker(WCMarker);
+					infoBox(map, WCMarker, data);
+					
+					//WCMarker.id = $scope.markerId;
+					//$scope.markerId++;
+					//$scope.markers.push(WCMarker);
+				}
+		
+				function infoBox(map, WCMarker, data) {
+					oms.addListener('click', function(WCMarker, event) {
+						infoWindow.setContent(WCMarker.desc);
+						infoWindow.open(map, WCMarker);
+					});
+			
+					oms.addListener('spiderfy', function(WCMarker) {
+						infoWindow.close();
+					});
+			
+					(function(WCMarker, data) {
+						google.maps.event.addListener(WCMarker, "click", function(e) {		
+																
+								if (data.rating == 1)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 2)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 3)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 4)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li>';
+								} else if (data.rating == 5)  {						
+									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li>';
+								} else if (data.rating == 0)  {						
+									var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+								}  
+								
+								var markerData = 
+									'<div id="map-info-window">'+
+										'<div id="map-info-window-inner">'+
+											'<p><b>'+ data.name +'</b></p>'+
+											'<p>' + data.address + '</p>' +
+											'<ul>' + rating_star + '</ul>' +
+											'<p>' +
+												'<div class="button-bar" style="border-bottom: 1px solid #ddd;">' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+													'<div class="button-bar__item">' +
+												    	'<button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button>' +
+													'</div>' +
+												'</div>' +
+											'</p>' +
+										'</div>'+
+									'</div>'									
+								;
+								
+								var compiledMarker = $compile(markerData)($scope);
+
+							infoWindow.setContent(compiledMarker[0]);
+							infoWindow.open(map, WCMarker);
+						});
+					})(WCMarker, data);
+					
+					
+					$scope.pushPage = function(id) {
+												
+						var json = (function () {
+							var json = null;
+							$.ajax({
+								'type':'GET',
+								'async': false,
+								'global': false,
+								'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+								'dataType': "json",
+								'data': $.param({ 
+									get_profile: id
+								}),
+								'success': function (data) {
+									json = data;
+								}
+							});
+							return json;							
+						})();
+												
+						var profile_id = json.variables.id;
+						
+						localStorage.setItem("profile_id", profile_id);
+						
+		  				mapNavigator.pushPage("marker.html", { animation : "slide" });
+		  					  				
+	  				};
+									
+					$scope.deleteMarker = function(id){
+		                ons.notification.confirm({
+			                title: 'Bevestiging',
+		                    message: 'Weet je zeker dat je deze WC wilt verwijderen?',
+		                    callback: function(idx) {
+		                        switch(idx) {
+		                            case 0:
+		                            
+		                                break;
+		                            case 1:
+		                            
+		                                /*for (var i = 0; i < $scope.markers.length; i++) {
+		                                    if ($scope.markers[i].id == WCMarker.id) {
+		                                        //Remove the marker from Map                  
+		                                        $scope.markers[i].setMap(null);
+		
+		                                        //Remove the marker from array.
+		                                        $scope.markers.splice(i, 1);
+		                                    }
+		                                }*/
+      		                                
+		                                var json = (function () {
+											var json = null;
+											$.ajax({
+												'type':'GET',
+												'async': false,
+												'global': false,
+												'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+												'dataType': "json",
+												'data': $.param({ 
+													delete_id: id
+												}),
+												'success': function (data) {
+													json = data;
+												}
+											});
+											return json;
+										})();
+												                               	
+		                                ons.notification.alert({
+			                                messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+											title: 'WC verwijderd',
+											buttonLabel: 'OK',
+											callback: function() {
+
+												localStorage.removeItem("profile_id");
+												location.reload();
+
+											}
+		                                });
+		                                
+		                                break;
+		                        }
+		                    }
+		                });   
+			        };					
+					
+  				}
+				       			        		
 		        //Add single Marker
 		        $scope.addOnClick = function(event) {
 		            var x = event.gesture.center.pageX;
 		            var y = event.gesture.center.pageY-44;
 		            var point = new google.maps.Point(x, y);
 		            var coordinates = $scope.overlay.getProjection().fromContainerPixelToLatLng(point);
-		
+					
+					var iconBase = 'img/';
 		            var marker = new google.maps.Marker({
 		                position: coordinates,
-		                map: $scope.map
+		                map: map,
+		                optimized: false,
+		                icon: iconBase + 'markerunrated.png'
 		            });
-		
+		           		            
 		            marker.id = $scope.markerId;
 		            $scope.markerId++;
 		            $scope.markers.push(marker);
-		        
+		            		        
 		            ons.notification.confirm({
 			            title: 'Bevestiging',
 	                    message: 'Weet je zeker dat je op deze locatie een wc wilt toevoegen?',
@@ -317,52 +732,23 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 										buttonLabel: 'OK'
 	                                });
 	                                break;
-	                            case 1:
-	                                ons.notification.alert({
-		                                messageHTML: '<div><ons-icon icon="fa-check" style="color:#25c2aa; font-size: 28px;"></ons-icon></div>',
-										title: 'WC toegevoegd',
-										buttonLabel: 'OK'
-	                                });
+	                            case 1:	 
+	                            								
+									$scope.AddMarkerShow('add-marker-form.html');
+																								
+									localStorage.setItem("marker-latitude", $scope.markers[0].position.A);
+		                            localStorage.setItem("marker-longitude", $scope.markers[0].position.F);	
+		                                                                       	
 	                                break;
 	                        }
 	                    }
 	                });
-		            		
-		            /*$timeout(function(){
-		                //Creation of the listener associated to the Markers click
-			            google.maps.event.addListener(marker, "click", function (e) {
-			                ons.notification.confirm({
-			                    message: 'Do you want to delete the marker?',
-			                    callback: function(idx) {
-			                        switch(idx) {
-			                            case 0:
-			                                ons.notification.alert({
-			                                    message: 'You pressed "Cancel".'
-			                                });
-			                                break;
-			                            case 1:
-			                                for (var i = 0; i < $scope.markers.length; i++) {
-			                                    if ($scope.markers[i].id == marker.id) {
-			                                        //Remove the marker from Map                  
-			                                        $scope.markers[i].setMap(null);
-			
-			                                        //Remove the marker from array.
-			                                        $scope.markers.splice(i, 1);
-			                                    }
-			                                }
-			                                ons.notification.alert({
-			                                    message: 'Marker deleted.'
-			                                });
-			                                break;
-			                        }
-			                    }
-			                });   
-			            });
-		            },1000);*/
-		        };
-		        				
+		        };  
+		        
+		        $scope.map = map;		       
+		         				
 			}
-			
+						
 			function onError(error) {
 				alert("message: " + error.message);
 				localStorage.setItem("message", error.message);
@@ -375,7 +761,7 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 	  	$scope.alert = function() {
 	    	ons.notification.alert({
 				//message: 'Message',
-				message: 'Tap op een locatie om een wc toe te voegen.',
+				message: 'Dubbel tap op een locatie om een wc toe te voegen.',
 				title: 'Info',
 				buttonLabel: 'OK',
 				animation: 'default', // or 'none'
@@ -389,45 +775,342 @@ module.controller('AddMarkerController', function($scope, $compile, $timeout) {
 	});
 });
 
+module.controller('AddMarkerFormController', function($scope, $compile, localStorageService, $http) {
+	ons.ready(function() {
+		
+		$scope.rating2 = 1;
+  		$scope.isReadonly = true;  		
+  		$scope.rateAddMarker = function(rating) { 		
+  			console.log("Rating selected: " + rating);
+  		}
+  		
+  		var marker_latitude = localStorage.getItem("marker-latitude");
+		var marker_longitude = localStorage.getItem("marker-longitude");	
+   		
+		$scope.AddMarkerSubmit = function() {
+			
+			var Device_id = device.uuid;
+			var Device_name = device.model;
+        	var WC_latitude = marker_latitude;
+        	var WC_longitude = marker_longitude;
+       	
+        	var json = (function () {
+				var json = null;
+				$.ajax({
+					'type':'GET',
+					'async': false,
+					'global': false,
+					'url': "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + WC_latitude + "," + WC_longitude + "&sensor=true",
+					'dataType': "json",
+					'success': function (data) {
+						json = data;
+					}
+				});
+				return json;										
+			})();
+			
+			WC_latitude = json.results[0].geometry.location.lat;									
+			WC_longitude = json.results[0].geometry.location.lng;
+			var WC_address = json.results[0].formatted_address;
+	                            									   		
+			$scope.data = [];
+			
+			$scope.data.push(Device_id);			
+			$scope.data.push($scope.marker_name);
+			$scope.data.push(WC_address);
+			$scope.data.push(WC_latitude);
+			$scope.data.push(WC_longitude);
+			$scope.data.push($scope.rating2);
+			$scope.data.push($scope.marker_comment);
+			$scope.data.push(Device_name);
+									
+			console.log($scope.data);
+			
+			$http({
+				url:'http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/insert_marker.php',
+				method:"POST",
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+			    data: $.param({ 
+					slug: "toilets",
+					device_id: $scope.data[0],  
+					name: $scope.data[1],
+					address: $scope.data[2],
+					latitude: $scope.data[3], 
+					longitude: $scope.data[4],
+					rating: $scope.data[5],
+				}),  // pass in data as strings
+				isArray: true,
+				callback: ''
+		  	}).success(function(data) {
+				if (!data) {
+					// if not successful, bind errors to error variables
+					console.log(data);
+					console.log('error');
+					
+					ons.notification.alert({
+                        messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+						title: 'Oeps... er is iets fout gegaan',
+						buttonLabel: 'OK',
+						callback: function() {
+							
+							localStorage.removeItem("profile_id");
+							location.reload();
+						
+						}
+                    });
+					
+				} else {
+				  	// if successful, bind success message to message
+				  	console.log(data);
+				  	console.log('success');
+				  	
+				  	var json = (function () {
+						var json = null;
+						$.ajax({
+							'type':'GET',
+							'async': false,
+							'global': false,
+							'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+							'dataType': "json",
+							'data': $.param({ 
+								get_toilets: "all"
+							}),
+							'success': function (data) {
+								json = data;
+							}
+						});
+						return json;
+					})();
+					
+					var profile_data_id = $(json).last()[0].id;
+									  	
+				  	$scope.data = [];
+			
+				  	$scope.data.push(profile_data_id );
+					$scope.data.push(Device_id);			
+					$scope.data.push($scope.rating2);
+					$scope.data.push($scope.marker_comment);
+					$scope.data.push(Device_name);
+											
+					console.log($scope.data);
+					
+					$http({
+						url:'http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/insert_marker.php',
+						method:"POST",
+						headers: {
+							'X-Requested-With': 'XMLHttpRequest',
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+					    data: $.param({ 
+							slug: "saveRateComment",
+							toilet_id: $scope.data[0], 
+							device_id: $scope.data[1],  
+							rating: $scope.data[2],
+							comment: $scope.data[3],
+							device_name: $scope.data[4]
+						}),  // pass in data as strings
+						isArray: true,
+						callback: ''
+				  	}).success(function(data) {
+						if (!data) {
+							// if not successful, bind errors to error variables
+							console.log(data);
+							console.log('error');
+							
+							ons.notification.alert({
+		                        messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+								title: 'Oeps... er is iets fout gegaan',
+								buttonLabel: 'OK',
+								callback: function() {
+									
+									localStorage.removeItem("profile_id");
+									location.reload();
+								
+								}
+		                    });
+							
+						} else {
+						  	// if successful, bind success message to message
+						  	console.log(data);
+						  	console.log('success');
+						  
+						  	ons.notification.alert({
+		                    	messageHTML: '<div><ons-icon icon="fa-check" style="color:#25c2aa; font-size: 28px;"></ons-icon></div>',
+								title: 'WC toegevoegd',
+								buttonLabel: 'OK',
+								callback: function() {
+															
+									localStorage.removeItem("profile_id");
+									location.reload();
+																			
+								}
+		                	});			                              	                                	
+						}
+					});
+							                              	                                	
+				}
+			});
+						  				  								  				
+		};
+		
+	});
+});
 
-	
-	
-	
-	
-	
-	
-	
-	
 
-module.controller('FavoritesController', function($scope) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.controller('FavoritesController', function($scope, localStorageService) {
 	ons.ready(function() {
 
 		$scope.fav_bar = {
 			name: "favorites"	
 		};
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_toilets: "all"
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+		
+		for (var i = 0; i < json.length; i ++) {
+			
+			var data = json[i];
+			
+			var element = document.getElementById("added-view");
+			
+			if (data.device_id == device.uuid) {
+			
+				if (data.type == 2 && data.rating <= 1)  {						
+					var image = "img/markerbad.png"
+				} else if (data.type == 2 && data.rating <= 3)  {						
+					var image =  "img/markermedium.png"
+				} else if (data.type == 2 && data.rating >= 4)  {						
+					var image =  "img/markergood.png"
+				} 
+				
+				if (data.rating == 1)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} else if (data.rating == 2)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} else if (data.rating == 3)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} else if (data.rating == 4)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} else if (data.rating == 5)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} else if (data.rating == 0)  {						
+					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+				} 
+				    			
+				var listData =
+					'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
+					    '<ons-row class="row ons-row-inner">' +
+						    '<ons-col width="35%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
+						    '<ons-col width="50%" class="col ons-col-inner">' +
+							    '<div class="name">' + data.name + '</div>' +
+							    '<div class="location"><i class="fa fa-map-marker"></i> 300 meter</div>' +
+							    '<div class="desc">' + rating_star + '</div>' +
+						    '</ons-col>' +
+						    '<ons-col width="25%" class="col ons-col-inner"></ons-col>' +
+					    '</ons-row>' +
+				    '</ons-list-item>'									
+				;
+					
+				var compiledData = $compile(listData)($scope);
+	
+				$(element).append(compiledData[0]);
+			
+			}
+					
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	});
 });
 
-module.controller('MarkerController', function($scope) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.controller('MarkerController', function($scope, $compile, localStorageService) {
 	ons.ready(function() {
-					
-		function geoLocation() {
-			var myLatlng = new google.maps.LatLng(51.441642, 5.469722);
 	
-			var mapOptions = {
-				center: myLatlng,
-				zoom: 16,
-				mapTypeId: google.maps.MapTypeId.ROADMAP,
-				disableDefaultUI: true
-	    	};
-			var map = new google.maps.Map(document.getElementById("map_marker"), mapOptions);
-	    
-			$scope.map = map;						
-		}
-	    	
-	  	google.maps.event.addDomListener(window, 'load', geoLocation()); 
-	  	
 	  	$scope.alert = function() {
 	    	ons.notification.alert({
 				//message: 'Message',
@@ -452,12 +1135,366 @@ module.controller('MarkerController', function($scope) {
 	    	} else {
 				$scope.dialogs[dlg].show();
 	    	}
-  		}	
+  		}
+  		
+  		var profile_value = localStorage.getItem("profile_id");
+    		
+  		var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_profile: profile_value
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+		
+		function geoLocation() {
+			var myLatlng = new google.maps.LatLng(json.variables.latitude, json.variables.longitude);
+	
+			var mapOptions = {
+				center: myLatlng,
+				zoom: 16,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				disableDefaultUI: true
+	    	};
+			var map = new google.maps.Map(document.getElementById("map_marker"), mapOptions);
+	    
+			$scope.map = map;						
+		}
+	    	
+	  	google.maps.event.addDomListener(window, 'load', geoLocation()); 
+				
+		var element1 = document.getElementById("profile_data");
+		var element2 = document.getElementById("rating_data");
+		
+		if (json.variables.type == 1 && json.variables.rating <= 1)  {						
+			var image = "img/markerbad.png"
+		} else if (json.variables.type == 1 && json.variables.rating <= 3)  {						
+			var image =  "img/markermedium.png"
+		} else if (json.variables.type == 1 && json.variables.rating >= 4)  {						
+			var image =  "img/markergood.png"
+		} else if (json.variables.type == 2)  {						
+			var image =  "img/markeradd.png"
+		} else if (json.variables.type == 0)  {						
+			var image =  "img/markerunrated.png"
+		}
+		
+		if (json.variables.rating == 1)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} else if (json.variables.rating == 2)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} else if (json.variables.rating == 3)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} else if (json.variables.rating == 4)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} else if (json.variables.rating == 5)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} else if (json.variables.rating == 0)  {						
+			var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+		} 
+		    			
+		var profile_Data =			    					
+	  		'<div class="card-name">' + json.variables.name + '</div>' +
+	  		'<div class="card-desc">' + json.variables.address + '</div>' +
+	  		'<div class="card-image"><img src=' + image + '></div>'
+		;
+		
+		var compiledData1 = $compile(profile_Data)($scope);
+
+		$(element1).append(compiledData1);
+		
+		var rating_Data =
+		  	'<div class="rating">' +
+		        '<div class="rating-num">' + rating_star + '</div>' +
+	        '</div>'							
+		;
+		
+		var compiledData2 = $compile(rating_Data)($scope);
+
+		$(element2).append(compiledData2[0]);
+				
+		var element3 = document.getElementById("comment_data");
+		
+		var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_comments: 'all'
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+		
+		var comment_id_data = [];
+				
+		for (var i = 0; i < json.length; i ++) {
+			var data = json[i];
 			
+			if (data.toilet_id == profile_value) {
+				comment_id_data.push(data);	
+			}				
+		}
+		
+		for (var i = 0; i < comment_id_data.length; i ++) {			
+			var data = comment_id_data[i];
+						
+			if (data.rating == 1)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 2)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 3)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 4)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 5)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 0)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} 
+			
+			var comment_Data =
+				'<ons-list-item class="timeline-li">' +
+					'<ons-row>' +
+						'<ons-col>' +
+							'<div class="timeline-date">' + data.timestamp +'</div>' +
+							'<div class="timline-from">' +
+								'<span class="timeline-name">' + data.device_name +'</span>' +
+								'<span class="timeline-id">' + rating_star + '</span>' +
+	            			'</div>' +
+							'<div class="timeline-message">' + data.comment + '</div>' +
+						'</ons-col>' +
+					'</ons-row>' +
+				'</ons-list-item>'						
+			;
+			
+			var compiledData3 = $compile(comment_Data)($scope);
+	
+			$(element3).append(compiledData3[0]);		
+		}
+		
+		$scope.remove_id = function() {
+			localStorage.removeItem("profile_id");		
+		};
+		
 	});
 });
 
-module.controller('SettingsController', function($scope) {
+module.controller('CommentController', function($scope, $compile, localStorageService, $http) {
+	ons.ready(function() {
+		
+		$scope.rating1 = 1;
+  		$scope.isReadonly = true;  		
+  		$scope.rateFunction = function(rating) { 		
+  			console.log("Rating selected: " + rating);
+  		}
+  		
+  		$scope.submit = function() {
+	  				  		
+	  		var profile_value = localStorage.getItem("profile_id");	  		
+	  		var Device_id = device.uuid;
+	  		var Device_name = device.model;
+	  		
+  			$scope.data = [];
+												
+			$scope.data.push(parseInt(profile_value));
+			$scope.data.push(Device_id);
+			$scope.data.push(Device_name);
+			$scope.data.push($scope.comment_text);
+			$scope.data.push($scope.rating1);
+												
+			console.log($scope.data);
+			
+			$http({
+				url:'http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/insert_marker.php',
+				method:"POST",
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+			    data: $.param({ 
+					slug: "comments",
+					toilet_id: $scope.data[0], 
+					device_id: $scope.data[1],
+					device_name: $scope.data[2],  
+					comment: $scope.data[3],
+					rating: $scope.data[4]
+				}),  // pass in data as strings
+				isArray: true,
+				callback: ''
+		  	}).success(function(data) {
+				if (!data) {
+					// if not successful, bind errors to error variables
+					console.log(data);
+					console.log('error');
+					
+					ons.notification.alert({
+                        messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+						title: 'Oeps... er is iets fout gegaan',
+						buttonLabel: 'OK',
+						callback: function() {
+
+							localStorage.removeItem("profile_id");
+							location.reload();
+							
+						}
+                    });
+					
+				} else {
+				  	// if successful, bind success message to message
+				  	console.log(data);
+				  	console.log('success');
+				  					  	
+				  	var json = (function () {
+						var json = null;
+						$.ajax({
+							'type':'GET',
+							'async': false,
+							'global': false,
+							'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+							'dataType': "json",
+							'data': $.param({
+								get_rates: profile_value
+							}),
+							'success': function (data) {
+								json = data;
+							}
+						});
+						return json;
+					})();
+							  	
+				  	var rates = [];
+				  	
+				  	for (var i = 0; i < json.length; i ++) {
+						var data = json[i];
+						rates.push(data.rating);
+					}
+						
+					var average = rates.map(function(x,i,arr){return x/arr.length}).reduce(function(a,b){return a + b});
+				  	
+				  	$scope.data = [];
+												
+					$scope.data.push(parseInt(profile_value));
+					$scope.data.push(average);
+														
+					console.log($scope.data);
+				  					  	
+				  	$http({
+						url:'http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/insert_marker.php',
+						method:"POST",
+						headers: {
+							'X-Requested-With': 'XMLHttpRequest',
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+					    data: $.param({ 
+							slug: "updateRating",
+							toilet_id: $scope.data[0], 
+							rating: $scope.data[1]
+						}),  // pass in data as strings
+						isArray: true,
+						callback: ''
+				  	}).success(function(data) {
+						if (!data) {
+							// if not successful, bind errors to error variables
+							console.log(data);
+							console.log('error');
+							
+							ons.notification.alert({
+		                        messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+								title: 'Oeps... er is iets fout gegaan',
+								buttonLabel: 'OK',
+								callback: function() {
+		
+									localStorage.removeItem("profile_id");
+									location.reload();
+									
+								}
+		                    });
+							
+						} else {
+							// if successful, bind success message to message
+							console.log(data);
+							console.log('success');
+						  							  							  	  	
+						  	ons.notification.alert({
+		                    	messageHTML: '<div><ons-icon icon="fa-check" style="color:#25c2aa; font-size: 28px;"></ons-icon></div>',
+								title: 'Reactie en beoordeling toegevoegd',
+								buttonLabel: 'OK',
+								callback: function() {
+										
+									localStorage.removeItem("profile_id");
+									location.reload();
+									
+								}
+		                	});		                              	                                	
+						}
+					});
+				  	                              	                                	
+				}
+			});		
+	  		
+	  	};	
+		
+	});
+});
+
+module.directive("starRating", function() {
+		return {
+			restrict : "EA",
+				template : "<ul class='rating-stars' ng-class='{readonly: readonly}'>" +
+				"  <li ng-repeat='star in stars' ng-class='star' ng-click='toggle($index)'>" +
+				"    <i class='ion-star'></i>" + //&#9733
+				"  </li>" +
+				"</ul>",
+				
+			scope : {
+				ratingValue : "=ngModel",
+				max : "=?", //optional: default is 5
+				onRatingSelected : "&?",
+				readonly: "=?"
+		},
+		link : function(scope, elem, attrs) {
+			if (scope.max == undefined) { scope.max = 5; }
+			function updateStars() {
+				scope.stars = [];
+				for (var i = 0; i < scope.max; i++) {
+					scope.stars.push({
+						filled : i < scope.ratingValue
+					});
+				}
+				};
+				scope.toggle = function(index) {
+					if (scope.readonly == undefined || scope.readonly == false){
+						scope.ratingValue = index + 1;
+						scope.onRatingSelected({
+							rating: index + 1
+						});
+				}
+				};
+				scope.$watch("ratingValue", function(oldVal, newVal) {
+					if (newVal) { updateStars(); }
+				});
+			}
+		};
+});
+
+module.controller('SettingsController', function($scope, localStorageService) {
 	ons.ready(function() {
 		
 		
@@ -469,5 +1506,105 @@ module.controller('SettingsController', function($scope) {
 	    }
 		
 		
+	});
+});
+
+module.controller('MenuController', function($scope, $http, $compile, localStorageService) {
+	ons.ready(function() {
+		
+		var json = (function () {
+			var json = null;
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_toilets: "all"
+				}),
+				'success': function (data) {
+					json = data;
+				}
+			});
+			return json;
+		})();
+		
+		for (var i = 0; i < json.length; i ++) {
+			
+			var data = json[i];
+			
+			var element = document.getElementById("list-view");
+			
+			if (data.type == 2 && data.rating <= 1)  {						
+				var image = "img/markerbad.png"
+			} else if (data.type == 2 && data.rating <= 3)  {						
+				var image =  "img/markermedium.png"
+			} else if (data.type == 2 && data.rating >= 4)  {						
+				var image =  "img/markergood.png"
+			} 
+			
+			if (data.rating == 1)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 2)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 3)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 4)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 5)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} else if (data.rating == 0)  {						
+				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+			} 
+			    			
+			var listData =
+				'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
+				    '<ons-row class="row ons-row-inner">' +
+					    '<ons-col width="35%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
+					    '<ons-col width="50%" class="col ons-col-inner">' +
+						    '<div class="name">' + data.name + '</div>' +
+						    '<div class="location"><i class="fa fa-map-marker"></i> 300 meter</div>' +
+						    '<div class="desc">' + rating_star + '</div>' +
+					    '</ons-col>' +
+					    '<ons-col width="25%" class="col ons-col-inner"></ons-col>' +
+				    '</ons-row>' +
+			    '</ons-list-item>'									
+			;
+				
+			var compiledData = $compile(listData)($scope);
+
+			$(element).append(compiledData[0]);
+					
+		}
+		
+		$scope.pushPage = function(id) {
+			
+			var json = (function () {
+				var json = null;
+				$.ajax({
+					'type':'GET',
+					'async': false,
+					'global': false,
+					'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+					'dataType': "json",
+					'data': $.param({ 
+						get_profile: id
+					}),
+					'success': function (data) {
+						json = data;
+					}
+				});
+				return json;							
+			})();
+									
+			var profile_id = json.variables.id;
+			
+			localStorage.setItem("profile_id", profile_id);
+			
+			mapNavigator.pushPage("marker.html", { animation : "slide" }, menu.close());
+				
+		};
+	
 	});
 });

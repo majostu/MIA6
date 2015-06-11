@@ -150,13 +150,48 @@ body {
     padding: 0;
     z-index: -1; 
 }
- 
+
 .angular-google-map-container {
 	position: absolute;
     width:100%; 
     height: 100%; 
     margin: 0; 
     padding: 0;  
+}
+
+.adp-warnbox {
+	display: none;
+}
+
+.adp-legal {
+	display: none;
+}
+
+#panel {
+	background: #FFF;
+	margin; 0;
+	padding: 0;
+	display: none;
+	
+}
+
+.adp {
+	margin-top: -10px;
+	padding: 12px;
+}
+
+#warnings_panel {
+	position: absolute; 
+	width:100%;
+	height: auto;
+	text-align:center;
+	background: rgba(0, 0, 0, 0.5);
+	color: #FFF;
+}
+
+#warnings_panel p {
+	padding: 12px;
+	margin: 0;
 }
 
 /*
@@ -188,7 +223,7 @@ div#map-info-window > div#map-info-window-inner p {
 
 div#map-info-window > div#map-info-window-inner ul {
 	margin: 0;
-	padding: 0;
+	padding: 8px 0 8px 0;
 	list-style: none;
 }
 
@@ -199,6 +234,7 @@ div#map-info-window > div#map-info-window-inner ul li {
 
 div#map-info-window > div#map-info-window-inner ul li i {
     color: #8d8d8d;
+    font-size: 18px;
 }
 
 div#map-info-window > div#map-info-window-inner ul li i.active {
@@ -210,13 +246,13 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
     text-align: right; 
     width: 100%; 
     z-index: 1;
-    font-size: 18px;
+    font-size: 22px;
     right: 12px;
     bottom: 12px;
 }
 
 .info-icon .tab-icon {
-	color: #8d8d8d;
+	color: #25c2aa;
 }
 
 /*.par-buttons{
@@ -238,7 +274,7 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
 /*
  * FAVORITES
  */
-
+ 
 .list-item-container {
     line-height: 1;
     padding: 15px 0px 15px 15px;
@@ -249,6 +285,13 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
     height: 60px;
     border-radius: 4px;
     -webkit-border-radius: 4px;
+}
+
+.distance {
+	position: absolute;
+	right: 12px;
+	font-size: 12px;
+	opacity: 0.35;
 }
 
 .name {
@@ -520,7 +563,7 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
 }
 
 .timeline-from {
-  margin: 10px 0 6px 0;
+
 }
 
 .timeline-name {
@@ -529,8 +572,14 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
 }
 
 .timeline-id {
-  font-size: 14px;
-  opacity: 0.4;
+  font-size: 12px;
+  opacity: 1;
+  padding-left: 12px;
+  color: #8d8d8d;
+}
+
+.timeline-id .active {
+    color: #eeee6a;
 }
 
 .timeline-message {

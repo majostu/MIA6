@@ -147,7 +147,8 @@ body {
     width:100%; 
     height: 100%; 
     margin: 0; 
-    padding: 0;  
+    padding: 0;
+    z-index: -1; 
 }
  
 .angular-google-map-container {
@@ -171,21 +172,55 @@ body {
     z-index: -1; 
 }
 
+div#map-info-window {
+	width: 250px;
+}
+
+div#map-info-window > div#map-info-window-inner h2 {
+	margin: 0;
+	padding: 0;
+}
+
+div#map-info-window > div#map-info-window-inner p {
+	margin: 0;
+	padding: 0;
+}
+
+div#map-info-window > div#map-info-window-inner ul {
+	margin: 0;
+	padding: 8px 0 8px 0;
+	list-style: none;
+}
+
+div#map-info-window > div#map-info-window-inner ul li {
+	display: inline;
+}
+
+
+div#map-info-window > div#map-info-window-inner ul li i {
+    color: #8d8d8d;
+    font-size: 18px;
+}
+
+div#map-info-window > div#map-info-window-inner ul li i.active {
+    color: #eeee6a;
+}
+
 .info-icon {
     position: absolute; 
     text-align: right; 
     width: 100%; 
     z-index: 1;
-    font-size: 18px;
+    font-size: 22px;
     right: 12px;
     bottom: 12px;
 }
 
 .info-icon .tab-icon {
-	color: #8d8d8d;
+	color: #25c2aa;
 }
 
-.par-buttons{
+/*.par-buttons{
     position: absolute; 
     text-align: center; 
     width:100%; 
@@ -199,12 +234,12 @@ body {
 .btn-distance{
     z-index: 2; 
     margin-left: 5px;
-}
+}*/
 
 /*
  * FAVORITES
  */
-
+ 
 .list-item-container {
     line-height: 1;
     padding: 15px 0px 15px 15px;
@@ -215,6 +250,13 @@ body {
     height: 60px;
     border-radius: 4px;
     -webkit-border-radius: 4px;
+}
+
+.distance {
+	position: absolute;
+	right: 12px;
+	font-size: 12px;
+	opacity: 0.35;
 }
 
 .name {
@@ -313,7 +355,7 @@ body {
  #map_marker {
 	position: absolute;
     width:100%; 
-    height: 200px; 
+    height: 250px; 
     margin: 0; 
     padding: 0;  
     z-index: -1;
@@ -325,7 +367,7 @@ body {
     top:0;
     background: rgba(0,0,0,0.5);
     width:100%;
-    height:200px;
+    height:250px;
 }
 
 .gmnoprint a, .gmnoprint span {
@@ -346,7 +388,7 @@ body {
 
 .card {
   color: #fff;
-  height: 200px;
+  height: 250px;
 }
 
 .card-toolbar ons-back-button span {
@@ -362,7 +404,15 @@ body {
 }
 
 .card-desc {
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0.9;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.card-extra {
+  font-size: 12px;
   font-weight: 400;
   opacity: 0.9;
   text-align: center;
@@ -370,7 +420,7 @@ body {
 }
 
 .card-image {
-	padding-top: 10px;
+	padding-top: 22px;
   	text-align: center;
   	margin: 0 auto;
   	opacity: 0.9;
@@ -436,6 +486,11 @@ body {
 .rating-num ons-icon {
   font-size: 14px;
   vertical-align: -0px;
+  color: #8d8d8d;
+}
+
+.rating-num ons-icon.active {
+  color: #fff;
 }
 
 
@@ -473,7 +528,7 @@ body {
 }
 
 .timeline-from {
-  margin: 10px 0 6px 0;
+
 }
 
 .timeline-name {
@@ -482,8 +537,14 @@ body {
 }
 
 .timeline-id {
-  font-size: 14px;
-  opacity: 0.4;
+  font-size: 12px;
+  opacity: 1;
+  padding-left: 12px;
+  color: #8d8d8d;
+}
+
+.timeline-id .active {
+    color: #eeee6a;
 }
 
 .timeline-message {
@@ -501,6 +562,28 @@ ons-dialog p {
 
 input {
   width: 100%;
+}
+
+
+
+
+.rating-stars {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+ 
+.rating-stars li {
+    padding: 1px;
+    color: #8d8d8d;
+    font-size: 20px;
+    list-style-type: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.rating-stars li.filled {
+   	color: #eeee6a; //#21568b
 }
 
 
