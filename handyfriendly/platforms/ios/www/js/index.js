@@ -83,8 +83,17 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 		        
 		        $scope.mymarker = [];
 		        $scope.mymarkerId = 1;
-				
+		        				
 				var myLatlng = new google.maps.LatLng(lat, lng);
+				
+				var directionsService = new google.maps.DirectionsService();
+				// Create a renderer for directions and bind it to the map.
+				var rendererOptions = {
+					map: map
+				}
+				directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions)
+				
+				var stepDisplay = new google.maps.InfoWindow();				
 	    
 				var mapOptions = {
 					center: myLatlng,
@@ -94,20 +103,28 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 		    	};
 		    	
 				var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-		    
+						
 				var contentString = "<div><a ng-click='clickTest()'>Mijn locatie</a></div>";
 				var compiled = $compile(contentString)($scope);
 		
 				var infowindow = new google.maps.InfoWindow({
 					content: compiled[0]
 		    	});
-				var iconBase = 'img/';
+				
+				var icon_myPos = {
+				    url: "img/wheelchair.png",
+				    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+				    origin: new google.maps.Point(0,0), // origin
+				    anchor: new google.maps.Point(0, 0) // anchor*/
+				};
+				
 				var MyMarker = new google.maps.Marker({
 					position: myLatlng,
 					map: map,
 					title: 'Mijn huidige locatie',
 					optimized: false,
-					icon: iconBase + 'wheelchair.png'
+					animation: google.maps.Animation.DROP,
+					icon: icon_myPos
 		    	});
 		    			    	
 				google.maps.event.addListener(MyMarker, 'click', function() {
@@ -120,31 +137,55 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 		    			    	
 		    	var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true, keepSpiderfied: true, nearbyDistance: 20, legWeight: 1});
 				var infoWindow = new google.maps.InfoWindow();
-				
+								
 				for (var i = 0; i < json.length; i ++) {
 					var data = json[i];
 					var loc = new google.maps.LatLng(data.latitude, data.longitude);
-					var iconBase = 'img/';
+										
+					var icon_bad = {
+					    url: "img/markerbadicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+							origin: new google.maps.Point(0,0), // origin
+							anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+					
+					var icon_medium = {
+					    url: "img/markermediumicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+							origin: new google.maps.Point(0,0), // origin
+							anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+					
+					var icon_good = {
+					    url: "img/markergoodicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+						origin: new google.maps.Point(0,0), // origin
+						anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+										
 					if (data.type == 2 && data.rating <= 1)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markerbad.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_bad
 						});							
 					} else if (data.type == 2 && data.rating <= 3)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markermedium.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_medium
 						});							
 					} else if (data.type == 2 && data.rating >= 4)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markergood.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_good
 						});							
 					} 
 					
@@ -166,54 +207,151 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 					oms.addListener('spiderfy', function(WCMarker) {
 						infoWindow.close();
 					});
-			
+					
+						
 					(function(WCMarker, data) {
+						
 						google.maps.event.addListener(WCMarker, "click", function(e) {		
 																
-								if (data.rating == 1)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 2)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 3)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 4)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 5)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li>';
-								} else if (data.rating == 0)  {						
-									var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								}  
-								
-								var markerData = 
-									'<div id="map-info-window">'+
-										'<div id="map-info-window-inner">'+
-											'<p><b>'+ data.name +'</b></p>'+
-											'<p>' + data.address + '</p>' +
-											'<ul>' + rating_star + '</ul>' +
-											'<p>' +
-												'<div class="button-bar" style="border-bottom: 1px solid #ddd;">' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-												'</div>' +
-											'</p>' +
-										'</div>'+
-									'</div>'									
-								;
-								
-								var compiledMarker = $compile(markerData)($scope);
+							if (data.rating == 1)  {						
+								var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+							} else if (data.rating == 2)  {						
+								var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+							} else if (data.rating == 3)  {						
+								var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+							} else if (data.rating == 4)  {						
+								var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li>';
+							} else if (data.rating == 5)  {						
+								var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li>';
+							} else if (data.rating == 0)  {						
+								var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
+							} 
+							
+							if (data.device_id == "USER_ID") {
+								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button></div></div>';
+							} else {
+								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div></div>';
+							}
+							
+							var markerData = 
+								'<div id="map-info-window">'+
+									'<div id="map-info-window-inner">'+
+										'<p><b>'+ data.name +'</b></p>'+
+										'<p>' + data.address + '</p>' +
+										'<ul>' + rating_star + '</ul>' +
+										'<p>' + MarkerBin + '</p>' +
+									'</div>'+
+								'</div>'									
+							;
+							
+							var compiledMarker = $compile(markerData)($scope);
 
 							infoWindow.setContent(compiledMarker[0]);
 							infoWindow.open(map, WCMarker);
 						});
 					})(WCMarker, data);
+																			
+					$scope.getDirection = function(id) {
+										
+						$(".map_button").show();
+						
+						infoWindow.close(map, WCMarker);
+									
+						var json = (function () {
+							var json = null;
+							$.ajax({
+								'type':'GET',
+								'async': false,
+								'global': false,
+								'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+								'dataType': "json",
+								'data': $.param({ 
+									get_profile: id
+								}),
+								'success': function (data) {
+									json = data;
+								}
+							});
+							return json;							
+						})();
+												
+						var profile_address = json.variables.address;
+					    
+					    markerArray = [];
+					        				    
+						// First, remove any existing markers from the map.
+						for (var i = 0; i < markerArray.length; i++) {
+							markerArray[i].setMap(null);
+							markerArray.splice(i, 1);
+						}
+						
+						// Now, clear the array itself.
+						markerArray = [];
+						
+						// Retrieve the start and end locations and create
+						// a DirectionsRequest using WALKING directions.
+						directionsDisplay.setMap(map);
+						  
+						var request = {
+							origin: myLatlng,
+							destination: profile_address,
+							travelMode: google.maps.TravelMode.WALKING
+						};
+						
+						// Route the directions and pass the response to a
+						// function to create markers for each step.
+						directionsService.route(request, function(response, status) {
+							if (status == google.maps.DirectionsStatus.OK) {
+						    	var warnings = document.getElementById('warnings_panel');
+								warnings.innerHTML = '<p>De afstand tot het toilet is <b>' + response.routes[0].legs[0].distance.text + '</b></p>';
+								directionsDisplay.setDirections(response);
+								showSteps(response);
+						    }						    
+						});
+												 						  											   
+				    };
+				    
+				    function showSteps(directionResult) {
+					    
+				      markerArray = [];
+					  // For each step, place a marker, and add the text to the marker's
+					  // info window. Also attach the marker to an array so we
+					  // can keep track of it and remove it when calculating new
+					  // routes.
+					  var myRoute = directionResult.routes[0].legs[0];
 					
+					  for (var i = 0; i < myRoute.steps.length; i++) {
+					    var Setmarker = new google.maps.Marker({
+					      position: myRoute.steps[i].start_location,
+					      map: map
+					    });
+					    attachInstructionText(Setmarker, myRoute.steps[i].instructions);
+					    markerArray[i] = Setmarker;
+					  }
+					  
+					}
+					
+					function attachInstructionText(Setmarker, text) {
+					  google.maps.event.addListener(Setmarker, 'click', function() {
+					    // Open an info window when the marker is clicked on,
+					    // containing the text of the step.
+					    stepDisplay.setContent(text);
+					    stepDisplay.open(map, Setmarker);
+					  });
+					}
+				    
+				    $scope.stopDirection = function() {
+		
+						$(".map_button").hide();
+						
+						location.reload();
+																		
+						directionsDisplay.setMap(null);
+						directionDisplay.setPanel(null);
+						directionsDisplay.setDirections(null);						
+						stepDisplay.setContent(null);
+								
+					};
 					
 					$scope.pushPage = function(id) {
 												
@@ -301,97 +439,73 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 			        };					
 					
   				}
-  				  				  				
+  				
+  				
+  				//mymarker_lat = $scope.mymarker[0].position.A;
+  				//mymarker_long = $scope.mymarker[0].position.F;
+  				
+  				//var mymarker = new google.maps.LatLng(mymarker_lat, mymarker_long);
+  				
+  				
+  				
+  				
+  				$scope.closestMarker = function() { 
+	  				  				
+	  				/*console.log($scope.markers);
+	  				
+	  				$scope.rad = function(x) {
+			            return x * Math.PI / 180;
+			        };
+	  									  	
+	                var totalDistance = 0;
+	                var partialDistance = [];
+	                partialDistance.length = $scope.markers.length -1;
+	
+	                for(var i = 0; i < partialDistance.length; i++){
+		                	                
+	                    var p1 = $scope.mymarker[i];
+	                    var p2 = $scope.markers[i++];
+						
+	                    var R = 6378137; // Earth’s mean radius in meter
+	                    var dLat = $scope.rad(p2.position.lat() - p1.position.lat());
+	                    var dLong = $scope.rad(p2.position.lng() - p1.position.lng());
+	                    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+	                    Math.cos($scope.rad(p1.position.lat())) * Math.cos($scope.rad(p2.position.lat())) *
+	                    Math.sin(dLong / 2) * Math.sin(dLong / 2);
+	                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	                    totalDistance += R * c / 1000; //distance in Km
+	                    partialDistance[i] = R * c / 1000;
+	                    	                    		                    
+	                }		
+	
+	                ons.notification.confirm({
+	                    message: 'Do you want to see the partial distances?',
+	                    callback: function(idx) {
+	
+	                        ons.notification.alert({
+	                            message: "The total distance is " + totalDistance.toFixed(1) + " km"
+	                        });
+	
+	                        switch(idx) {
+	                            case 0:
+	
+	                                break;
+	                            case 1:
+	                                for (var i = (partialDistance.length - 1); i >= 0 ; i--) {
+	
+	                                    ons.notification.alert({
+	                                        message: "The partial distance from point " + (i+1) + " to point " + (i+2) + " is " + partialDistance[i].toFixed(1) + " km"
+	                                    });
+	                                }
+	                                break;
+	                        }
+	                    }
+	                });*/
+			    				    				    	
+				}
+  				  				  				  				  				
 				$scope.map = map;
-				
-				/*var markers_data = $scope.markers;
-				var mymarker_data = $scope.mymarker;
-				
-				var latLngA = [];
-				var latLngB = [];
-				
-				for (var i = 0; i < mymarker_data.length; i ++) {
-					var data = mymarker_data[i];
-										
-					latLngA.push(data.position.A, data.position.F);
-					
-				}
-				
-				for (var i = 0; i < markers_data.length; i ++) {
-					var data = markers_data[i];
-										
-					latLngB.push(data.position.A, data.position.F);
-					
-				}
-				
-				console.log(latLngA);
-				console.log(latLngB);
-								
-				var iets = google.maps.geometry.spherical.computeDistanceBetween (latLngA, latLngB);
-				
-				console.log(iets);*/
-				
-				/*$scope.rad = function(x) {
-		            return x * Math.PI / 180;
-		        };
-				
-				//Calculate the distance between the Markers
-		        $scope.calculateDistance = function(){
-		
-		            if($scope.markers.length < 2){
-		                ons.notification.alert({
-		                    message: 'Insert at least 2 markers!!!'
-		                });
-		            }
-		            else{
-		                var totalDistance = 0;
-		                var partialDistance = [];
-		                partialDistance.length = $scope.markers.length - 1;
-		
-		                for(var i = 0; i < partialDistance.length; i++){
-		                    var p1 = $scope.mymarker[i];
-		                    var p2 = $scope.markers[i];
-		
-		                    var R = 6378137; // Earth’s mean radius in meter
-		                    var dLat = $scope.rad(p2.position.lat() - p1.position.lat());
-		                    var dLong = $scope.rad(p2.position.lng() - p1.position.lng());
-		                    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		                    Math.cos($scope.rad(p1.position.lat())) * Math.cos($scope.rad(p2.position.lat())) *
-		                    Math.sin(dLong / 2) * Math.sin(dLong / 2);
-		                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		                    totalDistance += R * c / 1000; //distance in Km
-		                    partialDistance[i] = R * c / 1000;
-		                }
-		
-		
-		                ons.notification.confirm({
-		                    message: 'Do you want to see the partial distances?',
-		                    callback: function(idx) {
-		
-		                        ons.notification.alert({
-		                            message: "The total distance is " + totalDistance.toFixed(1) + " km"
-		                        });
-		
-		                        switch(idx) {
-		                            case 0:
-		
-		                                break;
-		                            case 1:
-		                                for (var i = (partialDistance.length - 1); i >= 0 ; i--) {
-		
-		                                    ons.notification.alert({
-		                                        message: "The partial distance from point " + (i+1) + " to point " + (i+2) + " is " + partialDistance[i].toFixed(1) + " km"
-		                                    });
-		                                }
-		                                break;
-		                        }
-		                    }
-		                });
-		            }
-		        };
-		        
-		        $scope.calculateDistance();*/
-																					
+																									
 			}
 			
 			function onError(error) {
@@ -486,18 +600,24 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 					content: compiled[0]
 		    	});
 		    			    	
-		    	var iconBase = 'img/';
+		    	var icon_myPos = {
+				    url: "img/wheelchair.png",
+				    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+				    origin: new google.maps.Point(0,0), // origin
+				    anchor: new google.maps.Point(0, 0) // anchor*/
+				};
 								
 				var marker = new google.maps.Marker({
 					position: latlng,
 					map: map,
 					title: 'Mijn locatie',
 					optimized: false,
-					icon: iconBase + 'wheelchair.png'
+					animation: google.maps.Animation.DROP,
+					icon: icon_myPos
 		    	});
 		
 				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.open($map,marker);
+					infowindow.open(map,marker);
 		    	});
 		        
 	            $scope.overlay = new google.maps.OverlayView();
@@ -509,189 +629,62 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 	            });
 	            
 	            var oms = new OverlappingMarkerSpiderfier(map, {markersWontMove: true, markersWontHide: true, keepSpiderfied: true, nearbyDistance: 20, legWeight: 1});
-				var infoWindow = new google.maps.InfoWindow();
 				
 				for (var i = 0; i < json.length; i ++) {
 					var data = json[i];
 					var loc = new google.maps.LatLng(data.latitude, data.longitude);
-					var iconBase = 'img/';
+					
+					var icon_bad = {
+					    url: "img/markerbadicon.png",
+					    scaledSize: new google.maps.Size(66, 66), // scaled size
+					    origin: new google.maps.Point(0,0), // origin
+					    anchor: new google.maps.Point(0, 0) // anchor
+					};
+					
+					var icon_medium = {
+					    url: "img/markermediumicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+							origin: new google.maps.Point(0,0), // origin
+							anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+					
+					var icon_good = {
+					    url: "img/markergoodicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+						origin: new google.maps.Point(0,0), // origin
+						anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+					
 					if (data.type == 2 && data.rating <= 1)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markerbad.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_bad
 						});							
 					} else if (data.type == 2 && data.rating <= 3)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markermedium.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_medium
 						});							
 					} else if (data.type == 2 && data.rating >= 4)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
 							map: map,
-							icon: iconBase + 'markergood.png'
+							animation: google.maps.Animation.DROP,
+							icon: icon_good
 						});							
 					}
 					
 					WCMarker.desc = data.name;
 					oms.addMarker(WCMarker);
-					infoBox(map, WCMarker, data);
-					
-					//WCMarker.id = $scope.markerId;
-					//$scope.markerId++;
-					//$scope.markers.push(WCMarker);
 				}
-		
-				function infoBox(map, WCMarker, data) {
-					oms.addListener('click', function(WCMarker, event) {
-						infoWindow.setContent(WCMarker.desc);
-						infoWindow.open(map, WCMarker);
-					});
-			
-					oms.addListener('spiderfy', function(WCMarker) {
-						infoWindow.close();
-					});
-			
-					(function(WCMarker, data) {
-						google.maps.event.addListener(WCMarker, "click", function(e) {		
-																
-								if (data.rating == 1)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 2)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 3)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 4)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star"></i></li>';
-								} else if (data.rating == 5)  {						
-									var rating_star = 	'<li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li><li><i class="ion-star active"></i></li>';
-								} else if (data.rating == 0)  {						
-									var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
-								}  
-								
-								var markerData = 
-									'<div id="map-info-window">'+
-										'<div id="map-info-window-inner">'+
-											'<p><b>'+ data.name +'</b></p>'+
-											'<p>' + data.address + '</p>' +
-											'<ul>' + rating_star + '</ul>' +
-											'<p>' +
-												'<div class="button-bar" style="border-bottom: 1px solid #ddd;">' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-													'<div class="button-bar__item">' +
-												    	'<button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button>' +
-													'</div>' +
-												'</div>' +
-											'</p>' +
-										'</div>'+
-									'</div>'									
-								;
-								
-								var compiledMarker = $compile(markerData)($scope);
-
-							infoWindow.setContent(compiledMarker[0]);
-							infoWindow.open(map, WCMarker);
-						});
-					})(WCMarker, data);
-					
-					
-					$scope.pushPage = function(id) {
-												
-						var json = (function () {
-							var json = null;
-							$.ajax({
-								'type':'GET',
-								'async': false,
-								'global': false,
-								'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
-								'dataType': "json",
-								'data': $.param({ 
-									get_profile: id
-								}),
-								'success': function (data) {
-									json = data;
-								}
-							});
-							return json;							
-						})();
-												
-						var profile_id = json.variables.id;
-						
-						localStorage.setItem("profile_id", profile_id);
-						
-		  				mapNavigator.pushPage("marker.html", { animation : "slide" });
-		  					  				
-	  				};
-									
-					$scope.deleteMarker = function(id){
-		                ons.notification.confirm({
-			                title: 'Bevestiging',
-		                    message: 'Weet je zeker dat je deze WC wilt verwijderen?',
-		                    callback: function(idx) {
-		                        switch(idx) {
-		                            case 0:
-		                            
-		                                break;
-		                            case 1:
-		                            
-		                                /*for (var i = 0; i < $scope.markers.length; i++) {
-		                                    if ($scope.markers[i].id == WCMarker.id) {
-		                                        //Remove the marker from Map                  
-		                                        $scope.markers[i].setMap(null);
-		
-		                                        //Remove the marker from array.
-		                                        $scope.markers.splice(i, 1);
-		                                    }
-		                                }*/
-      		                                
-		                                var json = (function () {
-											var json = null;
-											$.ajax({
-												'type':'GET',
-												'async': false,
-												'global': false,
-												'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
-												'dataType': "json",
-												'data': $.param({ 
-													delete_id: id
-												}),
-												'success': function (data) {
-													json = data;
-												}
-											});
-											return json;
-										})();
-												                               	
-		                                ons.notification.alert({
-			                                messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
-											title: 'WC verwijderd',
-											buttonLabel: 'OK',
-											callback: function() {
-
-												localStorage.removeItem("profile_id");
-												location.reload();
-
-											}
-		                                });
-		                                
-		                                break;
-		                        }
-		                    }
-		                });   
-			        };					
-					
-  				}
-				       			        		
+		 			        		
 		        //Add single Marker
 		        $scope.addOnClick = function(event) {
 		            var x = event.gesture.center.pageX;
@@ -789,8 +782,12 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
    		
 		$scope.AddMarkerSubmit = function() {
 			
-			var Device_id = device.uuid;
-			var Device_name = device.model;
+			//var Device_id = device.uuid;
+			//var Device_name = device.model;
+			
+			var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
+			
         	var WC_latitude = marker_latitude;
         	var WC_longitude = marker_longitude;
        	
@@ -886,6 +883,7 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 					})();
 					
 					var profile_data_id = $(json).last()[0].id;
+					//var added_id = $(json).last()[0].id;
 									  	
 				  	$scope.data = [];
 			
@@ -894,6 +892,8 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 					$scope.data.push($scope.rating2);
 					$scope.data.push($scope.marker_comment);
 					$scope.data.push(Device_name);
+					
+					//$scope.data.push(added_id);
 											
 					console.log($scope.data);
 					
@@ -910,7 +910,8 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 							device_id: $scope.data[1],  
 							rating: $scope.data[2],
 							comment: $scope.data[3],
-							device_name: $scope.data[4]
+							device_name: $scope.data[4],
+							//added_id: $scope.data[5]
 						}),  // pass in data as strings
 						isArray: true,
 						callback: ''
@@ -959,41 +960,13 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 	});
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module.controller('FavoritesController', function($scope, localStorageService) {
+module.controller('FavoritesController', function($scope, $compile, $http, localStorageService) {
 	ons.ready(function() {
 
 		$scope.fav_bar = {
 			name: "favorites"	
 		};
-		
-		
-		
-		
-		
-		
-		
-		
-		
+								
 		var json = (function () {
 			var json = null;
 			$.ajax({
@@ -1016,9 +989,9 @@ module.controller('FavoritesController', function($scope, localStorageService) {
 			
 			var data = json[i];
 			
-			var element = document.getElementById("added-view");
+			var element1 = document.getElementById("added-view");
 			
-			if (data.device_id == device.uuid) {
+			if (data.device_id == "USER_ID") {
 			
 				if (data.type == 2 && data.rating <= 1)  {						
 					var image = "img/markerbad.png"
@@ -1045,10 +1018,10 @@ module.controller('FavoritesController', function($scope, localStorageService) {
 				var listData =
 					'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
 					    '<ons-row class="row ons-row-inner">' +
-						    '<ons-col width="35%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
+						    '<ons-col width="25%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
 						    '<ons-col width="50%" class="col ons-col-inner">' +
 							    '<div class="name">' + data.name + '</div>' +
-							    '<div class="location"><i class="fa fa-map-marker"></i> 300 meter</div>' +
+							    '<div class="location"><i class="fa fa-map-marker"></i> ' + data.address + '</div>' +
 							    '<div class="desc">' + rating_star + '</div>' +
 						    '</ons-col>' +
 						    '<ons-col width="25%" class="col ons-col-inner"></ons-col>' +
@@ -1058,71 +1031,259 @@ module.controller('FavoritesController', function($scope, localStorageService) {
 					
 				var compiledData = $compile(listData)($scope);
 	
-				$(element).append(compiledData[0]);
+				$(element1).append(compiledData[0]);
 			
 			}
 					
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+			
+		$scope.favorite_id = [];	
+		$scope.all = [];
+								
+		$.ajax({
+			'type':'GET',
+			'async': false,
+			'global': false,
+			'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+			'dataType': "json",
+			'data': $.param({ 
+				get_toilets: "all"
+				
+			}),
+			'success': function (all) {
+															
+				$.ajax({
+					'type':'GET',
+					'async': false,
+					'global': false,
+					'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+					'dataType': "json",
+					'data': $.param({ 
+						get_favorites: "all"
+					}),
+					'success': function (data) {
+						
+						angular.forEach(data, function(data) {
+							console.log(data.favorite_id);
+						
+							angular.forEach(all, function(all) {	
+								
+								if(data.favorite_id == all.id && data.device_id == "USER_ID") {
+								
+									$scope.favorite_id.push({id: data.favorite_id});
+																		
+									var element2 = document.getElementById("favorites-view");
+						
+									if (all.type == 2 && all.rating <= 1)  {						
+										var image = "img/markerbad.png"
+									} else if (all.type == 2 && all.rating <= 3)  {						
+										var image =  "img/markermedium.png"
+									} else if (all.type == 2 && all.rating >= 4)  {						
+										var image =  "img/markergood.png"
+									} 
+									
+									if (all.rating == 1)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} else if (all.rating == 2)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} else if (all.rating == 3)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} else if (all.rating == 4)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} else if (all.rating == 5)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} else if (all.rating == 0)  {						
+										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
+									} 
+									    			
+									var listData =
+										'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
+										    '<ons-row class="row ons-row-inner">' +
+											    '<ons-col width="25%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
+											    '<ons-col width="50%" class="col ons-col-inner">' +
+												    '<div class="name">' + all.name + '</div>' +
+												    '<div class="location"><i class="fa fa-map-marker"></i> ' + all.address + '</div>' +
+												    '<div class="desc">' + rating_star + '</div>' +
+											    '</ons-col>' +
+											    '<ons-col width="25%" class="col ons-col-inner"></ons-col>' +
+										    '</ons-row>' +
+									    '</ons-list-item>'									
+									;
+										
+									var compiledData = $compile(listData)($scope);
+						
+									$(element2).append(compiledData[0]);
+																		
+								}
+							});
+						});
+					}								
+				});				
+			}
+		});
+	
+		$scope.pushPage = function(id) {
+												
+			var json = (function () {
+				var json = null;
+				$.ajax({
+					'type':'GET',
+					'async': false,
+					'global': false,
+					'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+					'dataType': "json",
+					'data': $.param({ 
+						get_profile: id
+					}),
+					'success': function (data) {
+						json = data;
+					}
+				});
+				return json;							
+			})();
+									
+			var profile_id = json.variables.id;
+			
+			localStorage.setItem("profile_id", profile_id);
+			
+			favoritesNavigator.pushPage("marker.html", { animation : "slide" });
+					  				
+		};
+				
 	});
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module.controller('MarkerController', function($scope, $compile, localStorageService) {
+module.controller('MarkerController', function($scope, $compile, $http, localStorageService) {
 	ons.ready(function() {
 	
-	  	$scope.alert = function() {
-	    	ons.notification.alert({
-				//message: 'Message',
-				messageHTML: '<div><ons-icon icon="fa-check" style="color:#25c2aa; font-size: 28px;"></ons-icon></div>',
-				title: 'Toegevoegd aan favorieten',
-				buttonLabel: 'OK',
-				animation: 'default', // or 'none'
-				// modifier: 'optional-modifier'
-				callback: function() {
-			    // Alert button is closed!
-			  	}
+	  	$scope.addToFavorites = function() {
+		  	
+		  	var profile_value = localStorage.getItem("profile_id");
+		  	var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
+		  	
+		  	var json = (function () {
+				var json = null;
+				$.ajax({
+					'type':'GET',
+					'async': false,
+					'global': false,
+					'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+					'dataType': "json",
+					'data': $.param({ 
+						get_profile: profile_value
+					}),
+					'success': function (data) {
+						json = data;
+					}
+				});
+				return json;
+			})();
+						
+			var profile_data_id = json.variables.id;
+			
+			$scope.data = [];
+			
+		  	$scope.data.push(profile_data_id);
+		  	$scope.data.push(Device_id);
+		  	$scope.data.push(Device_name);
+									
+			console.log($scope.data);
+			
+			
+										
+			$.ajax({
+				'type':'GET',
+				'async': false,
+				'global': false,
+				'url': "http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/get_marker.php",
+				'dataType': "json",
+				'data': $.param({ 
+					get_favorite: profile_data_id
+				}),
+				'success': function (all) {
+					
+					angular.forEach(all, function(all) {
+																	
+						if(is.set(all.favorite_id) && all.favorite_id == profile_data_id && all.device_id == "USER_ID") {
+						
+							console.log("Bestaat al");
+							ons.notification.alert({
+		                    	messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+								title: 'Al reeds aan favorieten toegevoegd',
+								buttonLabel: 'OK',
+								animation: 'default', // or 'none'
+								// modifier: 'optional-modifier'
+								callback: function() {
+					
+								}
+		                	});	
+							
+						} else {
+							
+							console.log("MAG WEL");
+							
+							$http({
+								url:'http://marijnstuyfzand.nl/mia6/handyfriendly/www/php/insert_marker.php',
+								method:"POST",
+								headers: {
+									'X-Requested-With': 'XMLHttpRequest',
+									'Content-Type': 'application/x-www-form-urlencoded'
+								},
+							    data: $.param({ 
+									slug: "saveFavoriteMarker",
+									favorite_id: $scope.data[0],
+									device_id: $scope.data[1],
+									device_name: $scope.data[2]
+								}),  // pass in data as strings
+								isArray: true,
+								callback: ''
+						  	}).success(function(data) {
+								if (!data) {
+									// if not successful, bind errors to error variables
+									console.log(data);
+									console.log('error');
+									
+									ons.notification.alert({
+				                        messageHTML: '<div><ons-icon icon="fa-ban" style="color:#9d0d38; font-size: 28px;"></ons-icon></div>',
+										title: 'Oeps... er is iets fout gegaan',
+										buttonLabel: 'OK',
+										callback: function() {
+											
+											localStorage.removeItem("profile_id");
+											location.reload();
+										
+										}
+				                    });
+									
+								} else {
+								  	// if successful, bind success message to message
+								  	console.log(data);
+								  	console.log('success');
+								  
+								  	ons.notification.alert({
+				                    	messageHTML: '<div><ons-icon icon="fa-check" style="color:#25c2aa; font-size: 28px;"></ons-icon></div>',
+										title: 'Toegevoegd aan favorieten',
+										buttonLabel: 'OK',
+										animation: 'default', // or 'none'
+										// modifier: 'optional-modifier'
+										callback: function() {
+																	
+											localStorage.removeItem("profile_id");
+											location.reload();
+																					
+										}
+				                	});			                              	                                	
+								}
+							});
+							
+						}
+						
+					});
+										
+				}
 			});
+			
 	  	} 
 	  	
 	  	$scope.dialogs = {};   
@@ -1308,8 +1469,11 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
   		$scope.submit = function() {
 	  				  		
 	  		var profile_value = localStorage.getItem("profile_id");	  		
-	  		var Device_id = device.uuid;
-	  		var Device_name = device.model;
+	  		//var Device_id = device.uuid;
+	  		//var Device_name = device.model;
+	  		
+	  		var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
 	  		
   			$scope.data = [];
 												
@@ -1439,6 +1603,16 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 								callback: function() {
 										
 									localStorage.removeItem("profile_id");
+									/*$scope.$watch(function(){
+									
+										//ng-model="datavar (naam van element in index)"
+										
+										$scope.datavar = "Nieuwe waarde";
+										
+									});*/
+										
+									
+										
 									location.reload();
 									
 								}
@@ -1453,7 +1627,14 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 		
 	});
 });
-
+/*
+	
+	$index = markeridin array
+	$scope.removeItem = function($index) { //Functions to remove checklist item
+		$scope.marker.splice( $scope.marker.indexOf(), $index )
+		console.log($index);
+	}; //Dit is code om array 1 te verwijderen > ook weer een scope watch.. even angular functie door lezen, is n lastige en kan best uitgebreid worden..	
+*/	
 module.directive("starRating", function() {
 		return {
 			restrict : "EA",
@@ -1485,7 +1666,7 @@ module.directive("starRating", function() {
 						scope.onRatingSelected({
 							rating: index + 1
 						});
-				}
+					}
 				};
 				scope.$watch("ratingValue", function(oldVal, newVal) {
 					if (newVal) { updateStars(); }
@@ -1530,6 +1711,8 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 			return json;
 		})();
 		
+		
+		
 		for (var i = 0; i < json.length; i ++) {
 			
 			var data = json[i];
@@ -1557,14 +1740,38 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 			} else if (data.rating == 0)  {						
 				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
 			} 
-			    			
+								
+			/*var profile_address = data.address;
+		        	
+			var directionsService = new google.maps.DirectionsService();
+			var directionsDisplay = new google.maps.DirectionsRenderer();
+			// Retrieve the start and end locations and create
+			// a DirectionsRequest using WALKING directions.
+			directionsDisplay.setMap($scope.map);
+			
+			var myLatlng = new google.maps.LatLng(localStorage.getItem("latitude"), localStorage.getItem("longitude"));
+			 
+			var request = {
+				origin: myLatlng,
+				destination: profile_address,
+				travelMode: google.maps.TravelMode.WALKING
+			};
+			
+			directionsService.route(request, function(response, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+			    	directionsDisplay.setDirections(response);
+					var distance = response.routes[0].legs[0].distance.text;
+			    }
+										
+			});*/
+									
 			var listData =
 				'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
 				    '<ons-row class="row ons-row-inner">' +
 					    '<ons-col width="35%"><img src=' + image + ' class="col ons-col-inner thumbnail" /></ons-col>' +
 					    '<ons-col width="50%" class="col ons-col-inner">' +
 						    '<div class="name">' + data.name + '</div>' +
-						    '<div class="location"><i class="fa fa-map-marker"></i> 300 meter</div>' +
+						    '<div class="location"><i class="fa fa-map-marker"></i> ' + data.address + '</div>' +
 						    '<div class="desc">' + rating_star + '</div>' +
 					    '</ons-col>' +
 					    '<ons-col width="25%" class="col ons-col-inner"></ons-col>' +
@@ -1575,7 +1782,16 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 			var compiledData = $compile(listData)($scope);
 
 			$(element).append(compiledData[0]);
+			
+			
 					
+		}
+		
+	
+			
+		function onError(error) {
+			alert("message: " + error.message);
+			localStorage.setItem("message", error.message);
 		}
 		
 		$scope.pushPage = function(id) {
