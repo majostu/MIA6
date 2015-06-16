@@ -44,7 +44,9 @@ module.controller('AppController', function($scope, localStorageService) {
 		
 	});
 });
-
+/*=============================================================================================
+MAP CONTROLLER	
+=============================================================================================*/
 module.controller('MapController', function($scope, $compile, localStorageService) {
 	ons.ready(function() {
 			    
@@ -162,8 +164,15 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 						origin: new google.maps.Point(0,0), // origin
 						anchor: new google.maps.Point(0, 0) // anchor*/
 					};
+					
+					var icon_added = {
+					    url: "img/markeraddicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+						origin: new google.maps.Point(0,0), // origin
+						anchor: new google.maps.Point(0, 0) // anchor*/
+					};
 										
-					if (data.type == 2 && data.rating <= 1)  {						
+					if (data.type == 1 && data.rating <= 1)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -171,7 +180,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 							animation: google.maps.Animation.DROP,
 							icon: icon_bad
 						});							
-					} else if (data.type == 2 && data.rating <= 3)  {						
+					} else if (data.type == 1 && data.rating <= 3)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -179,7 +188,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 							animation: google.maps.Animation.DROP,
 							icon: icon_medium
 						});							
-					} else if (data.type == 2 && data.rating >= 4)  {						
+					} else if (data.type == 1 && data.rating >= 4)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -187,7 +196,15 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 							animation: google.maps.Animation.DROP,
 							icon: icon_good
 						});							
-					} 
+					} else if (data.device_id = device.uuid)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							animation: google.maps.Animation.DROP,
+							icon: icon_added
+						});							
+					}  
 					
 					WCMarker.desc = data.name;
 					oms.addMarker(WCMarker);
@@ -207,8 +224,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 					oms.addListener('spiderfy', function(WCMarker) {
 						infoWindow.close();
 					});
-					
-						
+											
 					(function(WCMarker, data) {
 						
 						google.maps.event.addListener(WCMarker, "click", function(e) {		
@@ -227,7 +243,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 								var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
 							} 
 							
-							if (data.device_id == "USER_ID") {
+							if (data.device_id == device.uuid) {
 								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button></div></div>';
 							} else {
 								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div></div>';
@@ -391,17 +407,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 		                            
 		                                break;
 		                            case 1:
-		                            
-		                                /*for (var i = 0; i < $scope.markers.length; i++) {
-		                                    if ($scope.markers[i].id == WCMarker.id) {
-		                                        //Remove the marker from Map                  
-		                                        $scope.markers[i].setMap(null);
-		
-		                                        //Remove the marker from array.
-		                                        $scope.markers.splice(i, 1);
-		                                    }
-		                                }*/
-      		                                
+		                                 		                                
 		                                var json = (function () {
 											var json = null;
 											$.ajax({
@@ -439,71 +445,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 			        };					
 					
   				}
-  				
-  				
-  				//mymarker_lat = $scope.mymarker[0].position.A;
-  				//mymarker_long = $scope.mymarker[0].position.F;
-  				
-  				//var mymarker = new google.maps.LatLng(mymarker_lat, mymarker_long);
-  				
-  				
-  				
-  				
-  				$scope.closestMarker = function() { 
-	  				  				
-	  				/*console.log($scope.markers);
-	  				
-	  				$scope.rad = function(x) {
-			            return x * Math.PI / 180;
-			        };
-	  									  	
-	                var totalDistance = 0;
-	                var partialDistance = [];
-	                partialDistance.length = $scope.markers.length -1;
-	
-	                for(var i = 0; i < partialDistance.length; i++){
-		                	                
-	                    var p1 = $scope.mymarker[i];
-	                    var p2 = $scope.markers[i++];
-						
-	                    var R = 6378137; // Earth’s mean radius in meter
-	                    var dLat = $scope.rad(p2.position.lat() - p1.position.lat());
-	                    var dLong = $scope.rad(p2.position.lng() - p1.position.lng());
-	                    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-	                    Math.cos($scope.rad(p1.position.lat())) * Math.cos($scope.rad(p2.position.lat())) *
-	                    Math.sin(dLong / 2) * Math.sin(dLong / 2);
-	                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	                    totalDistance += R * c / 1000; //distance in Km
-	                    partialDistance[i] = R * c / 1000;
-	                    	                    		                    
-	                }		
-	
-	                ons.notification.confirm({
-	                    message: 'Do you want to see the partial distances?',
-	                    callback: function(idx) {
-	
-	                        ons.notification.alert({
-	                            message: "The total distance is " + totalDistance.toFixed(1) + " km"
-	                        });
-	
-	                        switch(idx) {
-	                            case 0:
-	
-	                                break;
-	                            case 1:
-	                                for (var i = (partialDistance.length - 1); i >= 0 ; i--) {
-	
-	                                    ons.notification.alert({
-	                                        message: "The partial distance from point " + (i+1) + " to point " + (i+2) + " is " + partialDistance[i].toFixed(1) + " km"
-	                                    });
-	                                }
-	                                break;
-	                        }
-	                    }
-	                });*/
-			    				    				    	
-				}
-  				  				  				  				  				
+  							  				  				  				
 				$scope.map = map;
 																									
 			}
@@ -531,7 +473,9 @@ module.controller('MapController', function($scope, $compile, localStorageServic
       		
 	});
 });
-
+/*=============================================================================================
+ADD MARKER MAP CONTROLLER	
+=============================================================================================*/
 module.controller('AddMarkerController', function($scope, $compile, localStorageService, $http) {
 	ons.ready(function() {
 		
@@ -655,7 +599,14 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 						anchor: new google.maps.Point(0, 0) // anchor*/
 					};
 					
-					if (data.type == 2 && data.rating <= 1)  {						
+					var icon_added = {
+					    url: "img/markeraddicon.png",
+					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
+						origin: new google.maps.Point(0,0), // origin
+						anchor: new google.maps.Point(0, 0) // anchor*/
+					};
+					
+					if (data.type == 1 && data.rating <= 1)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -663,7 +614,7 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 							animation: google.maps.Animation.DROP,
 							icon: icon_bad
 						});							
-					} else if (data.type == 2 && data.rating <= 3)  {						
+					} else if (data.type == 1 && data.rating <= 3)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -671,7 +622,7 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 							animation: google.maps.Animation.DROP,
 							icon: icon_medium
 						});							
-					} else if (data.type == 2 && data.rating >= 4)  {						
+					} else if (data.type == 1 && data.rating >= 4)  {						
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -679,7 +630,15 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 							animation: google.maps.Animation.DROP,
 							icon: icon_good
 						});							
-					}
+					} else if (data.device_id = device.uuid)  {						
+						var WCMarker = new google.maps.Marker({
+							position: loc,
+							title: data.jobtitle,
+							map: map,
+							animation: google.maps.Animation.DROP,
+							icon: icon_added
+						});							
+					} 
 					
 					WCMarker.desc = data.name;
 					oms.addMarker(WCMarker);
@@ -767,7 +726,9 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 			
 	});
 });
-
+/*=============================================================================================
+ADD MARKER FORM CONTROLLER	
+=============================================================================================*/
 module.controller('AddMarkerFormController', function($scope, $compile, localStorageService, $http) {
 	ons.ready(function() {
 		
@@ -781,12 +742,9 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 		var marker_longitude = localStorage.getItem("marker-longitude");	
    		
 		$scope.AddMarkerSubmit = function() {
-			
-			//var Device_id = device.uuid;
-			//var Device_name = device.model;
-			
-			var Device_id = "USER_ID";
-			var Device_name = "USER_NAME";
+						
+			var Device_id = device.uuid;
+			var Device_name = device.model;
 			
         	var WC_latitude = marker_latitude;
         	var WC_longitude = marker_longitude;
@@ -959,7 +917,9 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 		
 	});
 });
-
+/*=============================================================================================
+FAVORITES CONTROLLER	
+=============================================================================================*/
 module.controller('FavoritesController', function($scope, $compile, $http, localStorageService) {
 	ons.ready(function() {
 
@@ -991,15 +951,17 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 			
 			var element1 = document.getElementById("added-view");
 			
-			if (data.device_id == "USER_ID") {
+			if (data.device_id == device.uuid) {
 			
 				if (data.type == 2 && data.rating <= 1)  {						
-					var image = "img/markerbad.png"
+					var image = "img/markerbadicon.png"
 				} else if (data.type == 2 && data.rating <= 3)  {						
-					var image =  "img/markermedium.png"
+					var image =  "img/markermediumicon.png"
 				} else if (data.type == 2 && data.rating >= 4)  {						
-					var image =  "img/markergood.png"
-				} 
+					var image =  "img/markergoodicon.png"
+				} /*else if (data.device_id == device.uuid)  {						
+					var image =  "img/markeraddicon.png"
+				}*/ 
 				
 				if (data.rating == 1)  {						
 					var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
@@ -1068,19 +1030,21 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 						
 							angular.forEach(all, function(all) {	
 								
-								if(data.favorite_id == all.id && data.device_id == "USER_ID") {
+								if(data.favorite_id == all.id && data.device_id == device.uuid) {
 								
 									$scope.favorite_id.push({id: data.favorite_id});
 																		
 									var element2 = document.getElementById("favorites-view");
 						
-									if (all.type == 2 && all.rating <= 1)  {						
-										var image = "img/markerbad.png"
-									} else if (all.type == 2 && all.rating <= 3)  {						
-										var image =  "img/markermedium.png"
-									} else if (all.type == 2 && all.rating >= 4)  {						
-										var image =  "img/markergood.png"
-									} 
+									if (all.rating <= 1)  {						
+										var image = "img/markerbadicon.png"
+									} else if (all.rating <= 3)  {						
+										var image =  "img/markermediumicon.png"
+									} else if (all.rating >= 4)  {						
+										var image =  "img/markergoodicon.png"
+									} /*else if (all.device_id == device.uuid)  {						
+										var image =  "img/markeraddicon.png"
+									}*/
 									
 									if (all.rating == 1)  {						
 										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
@@ -1152,15 +1116,17 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 				
 	});
 });
-
+/*=============================================================================================
+MARKER PROFILE CONTROLLER	
+=============================================================================================*/
 module.controller('MarkerController', function($scope, $compile, $http, localStorageService) {
 	ons.ready(function() {
 	
 	  	$scope.addToFavorites = function() {
 		  	
 		  	var profile_value = localStorage.getItem("profile_id");
-		  	var Device_id = "USER_ID";
-			var Device_name = "USER_NAME";
+		  	var Device_id = device.uuid;
+			var Device_name = device.model;
 		  	
 		  	var json = (function () {
 				var json = null;
@@ -1189,9 +1155,7 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 		  	$scope.data.push(Device_name);
 									
 			console.log($scope.data);
-			
-			
-										
+												
 			$.ajax({
 				'type':'GET',
 				'async': false,
@@ -1205,7 +1169,7 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 					
 					angular.forEach(all, function(all) {
 																	
-						if(is.set(all.favorite_id) && all.favorite_id == profile_data_id && all.device_id == "USER_ID") {
+						if(is.set(all.favorite_id) && all.favorite_id == profile_data_id && all.device_id == device.uuid) {
 						
 							console.log("Bestaat al");
 							ons.notification.alert({
@@ -1338,15 +1302,15 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 		var element2 = document.getElementById("rating_data");
 		
 		if (json.variables.type == 1 && json.variables.rating <= 1)  {						
-			var image = "img/markerbad.png"
+			var image = "img/markerbadicon.png"
 		} else if (json.variables.type == 1 && json.variables.rating <= 3)  {						
-			var image =  "img/markermedium.png"
+			var image =  "img/markermediumicon.png"
 		} else if (json.variables.type == 1 && json.variables.rating >= 4)  {						
-			var image =  "img/markergood.png"
+			var image =  "img/markergoodicon.png"
 		} else if (json.variables.type == 2)  {						
-			var image =  "img/markeradd.png"
-		} else if (json.variables.type == 0)  {						
-			var image =  "img/markerunrated.png"
+			var image =  "img/markeraddicon.png"
+		} else if (json.variables.device_id == device.uuid)  {						
+			var image =  "img/markeraddicon.png"
 		}
 		
 		if (json.variables.rating == 1)  {						
@@ -1456,7 +1420,9 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 		
 	});
 });
-
+/*=============================================================================================
+COMMENT CONTROLLER	
+=============================================================================================*/
 module.controller('CommentController', function($scope, $compile, localStorageService, $http) {
 	ons.ready(function() {
 		
@@ -1472,8 +1438,8 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 	  		//var Device_id = device.uuid;
 	  		//var Device_name = device.model;
 	  		
-	  		var Device_id = "USER_ID";
-			var Device_name = "USER_NAME";
+	  		var Device_id = device.uuid;
+			var Device_name = device.model;
 	  		
   			$scope.data = [];
 												
@@ -1602,17 +1568,7 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 								buttonLabel: 'OK',
 								callback: function() {
 										
-									localStorage.removeItem("profile_id");
-									/*$scope.$watch(function(){
-									
-										//ng-model="datavar (naam van element in index)"
-										
-										$scope.datavar = "Nieuwe waarde";
-										
-									});*/
-										
-									
-										
+									localStorage.removeItem("profile_id");					
 									location.reload();
 									
 								}
@@ -1627,14 +1583,9 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 		
 	});
 });
-/*
-	
-	$index = markeridin array
-	$scope.removeItem = function($index) { //Functions to remove checklist item
-		$scope.marker.splice( $scope.marker.indexOf(), $index )
-		console.log($index);
-	}; //Dit is code om array 1 te verwijderen > ook weer een scope watch.. even angular functie door lezen, is n lastige en kan best uitgebreid worden..	
-*/	
+/*=============================================================================================
+RATING SYSTEM
+=============================================================================================*/
 module.directive("starRating", function() {
 		return {
 			restrict : "EA",
@@ -1674,22 +1625,17 @@ module.directive("starRating", function() {
 			}
 		};
 });
-
+/*=============================================================================================
+SETTINGS CONTROLLER	
+=============================================================================================*/
 module.controller('SettingsController', function($scope, localStorageService) {
 	ons.ready(function() {
 		
-		
-		document.addEventListener("deviceready", onDeviceReady, false);
-
-	    function onDeviceReady() {
-	        var element = document.getElementById('device-uuid');
-	        element.innerHTML = ('Device UUID: ' + device.uuid + '');
-	    }
-		
-		
 	});
 });
-
+/*=============================================================================================
+MENU CONTROLLER	
+=============================================================================================*/
 module.controller('MenuController', function($scope, $http, $compile, localStorageService) {
 	ons.ready(function() {
 		
@@ -1710,22 +1656,22 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 			});
 			return json;
 		})();
-		
-		
-		
+				
 		for (var i = 0; i < json.length; i ++) {
 			
 			var data = json[i];
 			
 			var element = document.getElementById("list-view");
 			
-			if (data.type == 2 && data.rating <= 1)  {						
-				var image = "img/markerbad.png"
-			} else if (data.type == 2 && data.rating <= 3)  {						
-				var image =  "img/markermedium.png"
-			} else if (data.type == 2 && data.rating >= 4)  {						
-				var image =  "img/markergood.png"
-			} 
+			if (data.type == 1 && data.rating <= 1)  {						
+				var image = "img/markerbadicon.png"
+			} else if (data.type == 1 && data.rating <= 3)  {						
+				var image =  "img/markermediumicon.png"
+			} else if (data.type == 1 && data.rating >= 4)  {						
+				var image =  "img/markergoodicon.png"
+			} else if (data.device_id == device.uuid)  {						
+				var image =  "img/markeraddicon.png"
+			}   
 			
 			if (data.rating == 1)  {						
 				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
@@ -1740,31 +1686,7 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 			} else if (data.rating == 0)  {						
 				var rating_star =	'<ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
 			} 
-								
-			/*var profile_address = data.address;
-		        	
-			var directionsService = new google.maps.DirectionsService();
-			var directionsDisplay = new google.maps.DirectionsRenderer();
-			// Retrieve the start and end locations and create
-			// a DirectionsRequest using WALKING directions.
-			directionsDisplay.setMap($scope.map);
-			
-			var myLatlng = new google.maps.LatLng(localStorage.getItem("latitude"), localStorage.getItem("longitude"));
-			 
-			var request = {
-				origin: myLatlng,
-				destination: profile_address,
-				travelMode: google.maps.TravelMode.WALKING
-			};
-			
-			directionsService.route(request, function(response, status) {
-				if (status == google.maps.DirectionsStatus.OK) {
-			    	directionsDisplay.setDirections(response);
-					var distance = response.routes[0].legs[0].distance.text;
-			    }
-										
-			});*/
-									
+																	
 			var listData =
 				'<ons-list-item modifier="tappable chevron" class="list-item-container list__item ons-list-item-inner list__item--chevron" ng-click="pushPage(' + data.id + ')">' +
 				    '<ons-row class="row ons-row-inner">' +
@@ -1781,14 +1703,10 @@ module.controller('MenuController', function($scope, $http, $compile, localStora
 				
 			var compiledData = $compile(listData)($scope);
 
-			$(element).append(compiledData[0]);
-			
-			
+			$(element).append(compiledData[0]);			
 					
 		}
-		
-	
-			
+					
 		function onError(error) {
 			alert("message: " + error.message);
 			localStorage.setItem("message", error.message);

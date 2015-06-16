@@ -31,26 +31,7 @@ if (isset($_POST['slug']) && $_POST['slug'] == 'toilets'){
 		$creation = $toilets->Create();
 			
 		if($creation) { 
-			echo "SQL profile geschreven";
-
-			
-			/*$host = "mysql689int.cp.hostnet.nl";
-			$user  = "u58204_mia";
-			$password =  "mias6";
-			$database = "db58204_mia";
-			 
-			try {
-			    // Establish server connection and select database
-			    $dbh = new PDO("mysql:host=$host;dbname=$database", $user, $password);
-			    // run query to insert a record
-			    $dbh->query("SELECT * FROM toilets");
-			    echo "ID of the last inserted record is: ". $dbh->lastInsertId();
-			}catch(PDOException $e){
-			    die('Could not connect to the database:' . $e);
-			}*/
-			
-			
-	
+			echo "SQL profile geschreven";	
 		} else {
 			echo "SQL profile schrijven mislukt";
 		}
@@ -75,6 +56,19 @@ if (isset($_POST['slug']) && $_POST['slug'] == 'toilets'){
 		} else {
 			echo "SQL comment schrijven mislukt";
 		}
+		
+		/*$users->added_id 				= $_POST["added_id"]; 
+		$users->device_id				= $_POST["device_id"]; 
+		$users->device_name				= $_POST["device_name"];
+      	     	
+		$creation = $users->Create();
+	   
+		if($creation) { 
+			echo "SQL user geschreven";
+	
+		} else {
+			echo "SQL user schrijven mislukt";
+		}*/
 	
 	}
 	
@@ -116,6 +110,25 @@ if (isset($_POST['slug']) && $_POST['slug'] == 'toilets'){
 		}
 		
 	}
+} else if (isset($_POST['slug']) && $_POST['slug'] == 'saveFavoriteMarker'){
+	
+	if($_POST['slug'] == 'saveFavoriteMarker'){ 
+		
+		$favorites->favorite_id 			= $_POST["favorite_id"]; 
+		$favorites->device_id				= $_POST["device_id"]; 
+		$favorites->device_name				= $_POST["device_name"];
+      	     	
+		$creation = $favorites->Create();
+	   
+		if($creation) { 
+			echo "SQL favorite geschreven";
+	
+		} else {
+			echo "SQL favorite schrijven mislukt";
+		}
+			
+	}
+	
 } else {
 	echo "error";
 }

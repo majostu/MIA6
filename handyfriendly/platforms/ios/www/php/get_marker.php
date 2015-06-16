@@ -27,6 +27,11 @@ if (isset($_GET['get_toilets']) && $_GET['get_toilets'] == 'all') {
 	$comments->Delete();
 
 	echo json_encode($comments, JSON_NUMERIC_CHECK);
+	
+	$favorites->favorite_id = $_GET['delete_id'];		
+	$favorites->Delete();
+
+	echo json_encode($favorites, JSON_NUMERIC_CHECK);
 } else if (isset($_GET['get_profile'])) { 
 	$toilets->id = $_GET['get_profile'];		
 	$toilets->Find();
@@ -37,7 +42,15 @@ if (isset($_GET['get_toilets']) && $_GET['get_toilets'] == 'all') {
 } else if (isset($_GET['get_comments']) && $_GET['get_comments'] == 'all') { 
 	$data = $comments->all();
 	echo json_encode($data, JSON_NUMERIC_CHECK);
-}
+} else if (isset($_GET['get_favorites']) && $_GET['get_favorites'] == 'all') { 
+	
+	$data = $favorites->all();
+	echo json_encode($data, JSON_NUMERIC_CHECK);
+} else if (isset($_GET['get_favorite'])) { 
+	$favorites->favorite_id = $_GET['get_favorite'];		
+	$favorites->Find();
+	echo json_encode($favorites, JSON_NUMERIC_CHECK);
+} 
 
 
 //$data = $toilets->all();

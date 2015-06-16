@@ -7,7 +7,7 @@
 			protected $table = 'favorites';
 			
 			# Primary Key of the Table
-			protected $pk	 = 'id';
+			protected $pk	 = 'favorite_id';
 	}
 
 	class Comments  Extends Crud {

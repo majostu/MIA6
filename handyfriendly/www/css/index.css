@@ -101,6 +101,40 @@ body {
 	color: #7abfff;
 }
 
+.favorite-bar {
+	width: 100%;
+}
+
+.favorite-bar .button-bar__button {
+	border: 0px solid #ddd;
+	border-top: 1px solid #ddd;
+	border-bottom: 0px;
+	background-color: #ddd;
+}
+
+.favorite-bar .button-bar__item:first-child > .button-bar__button {
+	-webkit-border-top-left-radius: 0; 
+	border-top-left-radius: 0; 
+	-webkit-border-bottom-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+}
+
+.favorite-bar .button-bar__item:last-child > .button-bar__button {
+	-webkit-border-top-right-radius: 0;
+	border-top-right-radius: 0;
+	-webkit-border-bottom-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+}
+
+.favorite-bar .button-bar__item.active > .button-bar__button, :checked + .button-bar__button {
+	background-color: #fefefe;
+	color: #7abfff;
+}
+
 /*
  * MENU
  */
@@ -255,22 +289,6 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
 	color: #25c2aa;
 }
 
-/*.par-buttons{
-    position: absolute; 
-    text-align: center; 
-    width:100%; 
-    bottom:0px
-}
-
-.btn-delete{
-    z-index: 2;
-}
-
-.btn-distance{
-    z-index: 2; 
-    margin-left: 5px;
-}*/
-
 /*
  * FAVORITES
  */
@@ -373,16 +391,6 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
   	font-size: 14px;
 }
 
-
-
-
-
-
-
-
-
-
-
 /*
  * MARKER
  */
@@ -408,10 +416,10 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
 .gmnoprint a, .gmnoprint span {
     display:none;
 }
+
 .gmnoprint div {
     background:none !important;
 }
-
 
 .page--shop-details__content {
   position: absolute;
@@ -562,10 +570,6 @@ div#map-info-window > div#map-info-window-inner ul li i.active {
   opacity: 0.35;
 }
 
-.timeline-from {
-
-}
-
 .timeline-name {
   font-size: 15px;
   font-weight: 500;
@@ -599,9 +603,6 @@ input {
   width: 100%;
 }
 
-
-
-
 .rating-stars {
   margin: 0;
   padding: 0;
@@ -620,8 +621,3 @@ input {
 .rating-stars li.filled {
    	color: #eeee6a; //#21568b
 }
-
-
-
-
-
