@@ -162,6 +162,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 						origin: new google.maps.Point(0,0), // origin
 						anchor: new google.maps.Point(0, 0) // anchor*/
 					};
+<<<<<<< HEAD
 					
 					var icon_added = {
 					    url: "img/markeraddicon.png",
@@ -171,6 +172,10 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 					};
 										
 					if (data.type == 1 && data.rating <= 1)  {						
+=======
+										
+					if (data.type == 2 && data.rating <= 1)  {						
+>>>>>>> origin/project
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -242,7 +247,11 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 								var rating_star = 	'<li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li><li><i class="ion-star"></i></li>';
 							} 
 							
+<<<<<<< HEAD
 							if (data.device_id == device.uuid) {
+=======
+							if (data.device_id == "USER_ID") {
+>>>>>>> origin/project
 								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="deleteMarker(' + data.id +')"><i class="fa fa-trash-o" style="color: #25c2aa;"></i></button></div></div>';
 							} else {
 								var MarkerBin = '<div class="button-bar" style="border-bottom: 1px solid #ddd;"><div class="button-bar__item" ng-click="getDirection(' + data.id + ')"><button class="button-bar__button"><i class="fa fa-compass" style="color: #25c2aa;"></i></button></div><div class="button-bar__item"><button class="button-bar__button" ng-click="pushPage(' + data.id + ')"><i class="fa fa-info-circle" style="color: #25c2aa;"></i></button></div></div>';
@@ -334,6 +343,7 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 					  // can keep track of it and remove it when calculating new
 					  // routes.
 					  var myRoute = directionResult.routes[0].legs[0];
+<<<<<<< HEAD
 					
 					  for (var i = 0; i < myRoute.steps.length; i++) {
 					    var Setmarker = new google.maps.Marker({
@@ -346,6 +356,20 @@ module.controller('MapController', function($scope, $compile, localStorageServic
 					  
 					}
 					
+=======
+					
+					  for (var i = 0; i < myRoute.steps.length; i++) {
+					    var Setmarker = new google.maps.Marker({
+					      position: myRoute.steps[i].start_location,
+					      map: map
+					    });
+					    attachInstructionText(Setmarker, myRoute.steps[i].instructions);
+					    markerArray[i] = Setmarker;
+					  }
+					  
+					}
+					
+>>>>>>> origin/project
 					function attachInstructionText(Setmarker, text) {
 					  google.maps.event.addListener(Setmarker, 'click', function() {
 					    // Open an info window when the marker is clicked on,
@@ -670,6 +694,7 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 						anchor: new google.maps.Point(0, 0) // anchor*/
 					};
 					
+<<<<<<< HEAD
 					var icon_added = {
 					    url: "img/markeraddicon.png",
 					    /*scaledSize: new google.maps.Size(50, 50), // scaled size
@@ -678,6 +703,9 @@ module.controller('AddMarkerController', function($scope, $compile, localStorage
 					};
 					
 					if (data.type == 1 && data.rating <= 1)  {						
+=======
+					if (data.type == 2 && data.rating <= 1)  {						
+>>>>>>> origin/project
 						var WCMarker = new google.maps.Marker({
 							position: loc,
 							title: data.jobtitle,
@@ -815,8 +843,13 @@ module.controller('AddMarkerFormController', function($scope, $compile, localSto
 			//var Device_id = device.uuid;
 			//var Device_name = device.model;
 			
+<<<<<<< HEAD
 			var Device_id = device.uuid;
 			var Device_name = device.model;
+=======
+			var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
+>>>>>>> origin/project
 			
         	var WC_latitude = marker_latitude;
         	var WC_longitude = marker_longitude;
@@ -1021,7 +1054,7 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 			
 			var element1 = document.getElementById("added-view");
 			
-			if (data.device_id == device.uuid) {
+			if (data.device_id == "USER_ID") {
 			
 				if (data.type == 2 && data.rating <= 1)  {						
 					var image = "img/markerbadicon.png"
@@ -1100,12 +1133,17 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 						
 							angular.forEach(all, function(all) {	
 								
+<<<<<<< HEAD
 								if(data.favorite_id == all.id && data.device_id == device.uuid) {
+=======
+								if(data.favorite_id == all.id && data.device_id == "USER_ID") {
+>>>>>>> origin/project
 								
 									$scope.favorite_id.push({id: data.favorite_id});
 																		
 									var element2 = document.getElementById("favorites-view");
 						
+<<<<<<< HEAD
 									if (all.rating <= 1)  {						
 										var image = "img/markerbadicon.png"
 									} else if (all.rating <= 3)  {						
@@ -1115,6 +1153,15 @@ module.controller('FavoritesController', function($scope, $compile, $http, local
 									} /*else if (all.device_id == device.uuid)  {						
 										var image =  "img/markeraddicon.png"
 									}*/
+=======
+									if (all.type == 2 && all.rating <= 1)  {						
+										var image = "img/markerbad.png"
+									} else if (all.type == 2 && all.rating <= 3)  {						
+										var image =  "img/markermedium.png"
+									} else if (all.type == 2 && all.rating >= 4)  {						
+										var image =  "img/markergood.png"
+									} 
+>>>>>>> origin/project
 									
 									if (all.rating == 1)  {						
 										var rating_star =	'<ons-icon icon="ion-star" class="tab-icon active ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon><ons-icon icon="ion-star" class="tab-icon ons-icon ons-icon--ion ion-star fa-lg"></ons-icon>';
@@ -1193,8 +1240,13 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 	  	$scope.addToFavorites = function() {
 		  	
 		  	var profile_value = localStorage.getItem("profile_id");
+<<<<<<< HEAD
 		  	var Device_id = device.uuid;
 			var Device_name = device.model;
+=======
+		  	var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
+>>>>>>> origin/project
 		  	
 		  	var json = (function () {
 				var json = null;
@@ -1223,7 +1275,13 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 		  	$scope.data.push(Device_name);
 									
 			console.log($scope.data);
+<<<<<<< HEAD
 												
+=======
+			
+			
+										
+>>>>>>> origin/project
 			$.ajax({
 				'type':'GET',
 				'async': false,
@@ -1237,7 +1295,11 @@ module.controller('MarkerController', function($scope, $compile, $http, localSto
 					
 					angular.forEach(all, function(all) {
 																	
+<<<<<<< HEAD
 						if(is.set(all.favorite_id) && all.favorite_id == profile_data_id && all.device_id == device.uuid) {
+=======
+						if(is.set(all.favorite_id) && all.favorite_id == profile_data_id && all.device_id == "USER_ID") {
+>>>>>>> origin/project
 						
 							console.log("Bestaat al");
 							ons.notification.alert({
@@ -1504,8 +1566,13 @@ module.controller('CommentController', function($scope, $compile, localStorageSe
 	  		//var Device_id = device.uuid;
 	  		//var Device_name = device.model;
 	  		
+<<<<<<< HEAD
 	  		var Device_id = device.uuid;
 			var Device_name = device.model;
+=======
+	  		var Device_id = "USER_ID";
+			var Device_name = "USER_NAME";
+>>>>>>> origin/project
 	  		
   			$scope.data = [];
 												
